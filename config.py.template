@@ -1,0 +1,30 @@
+import logging
+
+logging.basicConfig()
+LOGGER = logging.getLogger("packagecontrol")
+LOGGER.setLevel(logging.INFO)
+
+# Secret key of the application
+# This key should not change over the lifetime of the application.
+# Generate with os.urandom(32)
+SECRET_KEY = b""
+
+# Storage configuration
+# There are multiple storage choices. In theory you can use everything sqlalchemy supports but only
+# SQLite and MariaDB are tested
+#
+# SQLite
+# Uncomment the following 2 lines to use SQLite as storage.
+#path = "packages.db"
+#DATABASE_URI = "sqlite:///{}".format(path)  # DO NOT CHANGE THIS
+
+# MySQL/MariaDB
+# Uncomment the following 5 lines for your setup to use MySQL or MariaDB as storage (pymysql is needed)
+#username = "user"
+#password = "pw"
+#host = "localhost"
+#database = "packagecontrol"
+#DATABASE_URI = "mysql+pymysql://{}:{}@{}/{}?charset=utf8mb4".format(username, password, host, database)  # DO NOT CHANGE THIS
+
+# Name of the package repository
+REPO_NAME = "My super awesome package repository"

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en" xml:lang="en">
+    <head>
+        <title>{{ title }}</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='package_control.css') }}" />
+    </head>
+    <body>
+        <p>
+            <a href="{{ url_for('index') }}">
+                <img src="{{ url_for('static', filename='package_control.ico') }}" alt="PackageControl WebApp" title="PackageControl WebApp"/>
+            </a>
+        </p>
+        <h1>{{ title }}</h1>
+        <div id="content">
+            {% from "_formhelper.html" import render_field %}
+            <form name="submit_package" method="post">
+                {{ form.csrf_token }}
+                {{ render_field(form.type) }}
+                {{ render_field(form.owner) }}
+                {{ render_field(form.repo) }}
+                {{ render_field(form.path) }}
+                {% if form.errors %}
+                <dl class="errors">
+                    <dt>Form errors:</dt>
+                    {% for error in form.errors %}
+                    <dd>{{ error }}</dd>
+                    {% endfor %}
+                </dl>
+                {% endif %}
+                <p><input type="submit" value="Submit" /></p>
+            </form>
+        </div>
+        <script>
+            if (document.submit_package !== undefined)
+            {{ '{' }}
+                {% for required_if_field in required_if_fields %}
+                if (document.submit_package.{{ required_if_field["if_field"] }}.value != '{{ required_if_field["if_field_value"] }}')
+                {{ '{' }}
+                    document.submit_package.{{ required_if_field["required"] }}.parentElement.style.display = 'None';
+                {{ '}' }}
+                document.submit_package.type.addEventListener('change',  function(event)
+                {{ '{' }}
+                    if (document.submit_package.{{ required_if_field["if_field"] }}.value != '{{ required_if_field["if_field_value"] }}')
+                    {{ '{' }}
+                        document.submit_package.{{ required_if_field["required"] }}.parentElement.style.display = 'None';
+                        document.submit_package.{{ required_if_field["required"] }}.value = '';
+                        document.submit_package.{{ required_if_field["required"] }}.required = false;
+                    {{ '}' }}
+                    else
+                    {{ '{' }}
+                        document.submit_package.{{ required_if_field["required"] }}.parentElement.style.display = '';
+                        document.submit_package.{{ required_if_field["required"] }}.required = true;
+                    {{ '}' }}
+                {{ '}' }});
+                {% endfor %}
+            {{ '}' }}
+        </script>
+    </body>
+</html>

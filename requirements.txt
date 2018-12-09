@@ -1,0 +1,5 @@
+python-dateutil>=2.7.5
+SQLAlchemy>=1.2.14
+Flask>=1.0.2
+Flask-WTF>=0.14.2
+requests>=2.20.1

@@ -1,0 +1,54 @@
+body
+{
+    width: 1200px;
+    margin: auto;
+    font-family: sans-serif;
+}
+h1, p
+{
+    text-align: center;
+}
+table
+{
+    width: 1000px;
+    margin: auto;
+    border-collapse: collapse;
+}
+th, td
+{
+    border: 3px inset purple;
+    padding: 2px 5px;
+}
+th:last-child, td:last-child
+{
+    border: none;
+}
+img
+{
+    text-align: center;
+}
+form
+{
+    position: relative;
+    width: 50%;
+    margin: auto;
+}
+form div
+{
+    margin: 5px;
+}
+form label
+{
+    width: 30%;
+    text-align: right;
+    display: inline-block;
+    margin-right: 5px;
+}
+form input
+{
+    width: 60%;
+}
+.errors
+{
+    color: red;
+}

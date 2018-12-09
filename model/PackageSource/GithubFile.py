@@ -1,0 +1,45 @@
+from model.PackageSource.PackageSourceBase import PackageSourceBase
+from config import LOGGER
+import requests
+import json
+import dateutil.parser
+import traceback
+import os.path
+
+
+class GithubFile(PackageSourceBase):
+    description = "Not a dedicated repository for the package, just a file within collective repository"
+
+    def __init__(self, package):
+        super().__init__(package)
+        self.package.name = os.path.splitext(os.path.basename(self.package.path))[0]
+        self.package.homepage = "https://github.com/{}/{}/tree/master/{}".format(self.package.owner,
+                                                                                 self.package.repo,
+                                                                                 self.package.path)
+
+    def update(self):
+        try:
+            api_url = "https://api.github.com/repos/{}/{}".format(self.package.owner, self.package.repo)
+            request_url = "{}/commits".format(api_url)
+            commit_json = json.loads(self.do_get_request(request_url, {'path': self.package.path}))
+            latest_commit = max(commit_json,
+                                key=lambda commit: dateutil.parser.parse(commit['commit']['committer']['date'],
+                                                                         ignoretz=True))
+            self.package.date = dateutil.parser.parse(latest_commit['commit']['committer']['date'], ignoretz=True)
+
+            request_url2 = "{}/contents/{}".format(api_url, self.package.path)
+            file_json = json.loads(self.do_get_request(request_url2, {'ref': latest_commit['sha']}))
+            self.package.download_url = file_json['download_url']
+            self.package.filename = file_json['name']
+            return True
+        except Exception as ex:
+            LOGGER.error(ex, traceback.format_exc())
+            return False
+
+    def is_available(self):
+        url = "https://github.com/{}/{}/blob/master/{}".format(self.package.owner, self.package.repo, self.package.path)
+        req = requests.head(url)
+        if req.status_code == 200:
+            return True
+        else:
+            return False
