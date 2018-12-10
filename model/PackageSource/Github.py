@@ -8,6 +8,7 @@ import traceback
 
 class Github(PackageSourceBase):
     description = "An entire repository on github.com dedicated to the package"
+    path_required = False
 
     def __init__(self, package):
         super().__init__(package)

@@ -9,6 +9,7 @@ import os.path
 
 class GithubFile(PackageSourceBase):
     description = "Not a dedicated repository for the package, just a file within collective repository"
+    path_required = True
 
     def __init__(self, package):
         super().__init__(package)

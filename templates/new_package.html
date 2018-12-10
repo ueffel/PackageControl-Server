@@ -35,25 +35,40 @@
             if (document.submit_package !== undefined)
             {{ '{' }}
                 {% for required_if_field in required_if_fields %}
-                if (document.submit_package.{{ required_if_field["if_field"] }}.value != '{{ required_if_field["if_field_value"] }}')
+                switch(document.submit_package.{{ required_if_field["if_field"] }}.value)
                 {{ '{' }}
-                    document.submit_package.{{ required_if_field["required"] }}.parentElement.style.display = 'None';
-                {{ '}' }}
-                document.submit_package.type.addEventListener('change',  function(event)
-                {{ '{' }}
-                    if (document.submit_package.{{ required_if_field["if_field"] }}.value != '{{ required_if_field["if_field_value"] }}')
-                    {{ '{' }}
-                        document.submit_package.{{ required_if_field["required"] }}.parentElement.style.display = 'None';
-                        document.submit_package.{{ required_if_field["required"] }}.value = '';
-                        document.submit_package.{{ required_if_field["required"] }}.required = false;
-                    {{ '}' }}
-                    else
-                    {{ '{' }}
+                    {% for required_if_value in required_if_field["if_field_value"] %}
+                    case '{{ required_if_value }}':
+                    {% endfor %}
                         document.submit_package.{{ required_if_field["required"] }}.parentElement.style.display = '';
                         document.submit_package.{{ required_if_field["required"] }}.required = true;
-                    {{ '}' }}
-                {{ '}' }});
+                        break;
+                    default:
+                        document.submit_package.{{ required_if_field["required"] }}.parentElement.style.display = 'None';
+                        document.submit_package.{{ required_if_field["required"] }}.required = false;
+                        break;
+                {{ '}' }}
                 {% endfor %}
+
+                document.submit_package.type.addEventListener('change',  function(event)
+                {{ '{' }}
+                    {% for required_if_field in required_if_fields %}
+                    switch(document.submit_package.{{ required_if_field["if_field"] }}.value)
+                    {{ '{' }}
+                        {% for required_if_value in required_if_field["if_field_value"] %}
+                        case '{{ required_if_value }}':
+                        {% endfor %}
+                            document.submit_package.{{ required_if_field["required"] }}.parentElement.style.display = '';
+                            document.submit_package.{{ required_if_field["required"] }}.required = true;
+                            break;
+                        default:
+                            document.submit_package.{{ required_if_field["required"] }}.parentElement.style.display = 'None';
+                            document.submit_package.{{ required_if_field["required"] }}.value = '';
+                            document.submit_package.{{ required_if_field["required"] }}.required = false;
+                            break;
+                    {{ '}' }}
+                    {% endfor %}
+                {{ '}' }});
             {{ '}' }}
         </script>
     </body>

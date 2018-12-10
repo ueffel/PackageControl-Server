@@ -127,7 +127,6 @@ def new_package():
 
     required_if_fields = form.required_if_fields()
 
-    print(required_if_fields)
     if request.method == 'POST' and form.validate():
         insert_package(form.owner.data, form.repo.data, form.type.data, form.path.data if form.path.data else None)
         return redirect(url_for('index'))

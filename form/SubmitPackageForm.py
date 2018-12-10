@@ -1,10 +1,10 @@
 from flask_wtf import FlaskForm
 from wtforms import SelectField, StringField, validators
+from wtforms.validators import AnyOf
 from form.RequiredIf import RequiredIf
 from flask import current_app as app
 from model.DB import db_session
 from model.Package import Package
-from sqlalchemy import literal
 
 
 class SubmitPackageForm(FlaskForm):
@@ -12,18 +12,18 @@ class SubmitPackageForm(FlaskForm):
                        choices=[('', '-- Choose Repo Type --')] + [(src.__name__, src.__name__)
                                                                    for src in app.config["package_sources"]],
                        validators=[validators.InputRequired()])
-    owner = StringField('Owner',
-                        description='Name of the package repository owner',
+    owner = StringField('Author / Owner',
+                        description='Name of the package repository owner or author',
                         render_kw={'placeholder': 'ueffel', 'required': True},
                         validators=[validators.InputRequired()])
-    repo = StringField('Repository',
-                       description='Name of the package repository',
+    repo = StringField('Repository / Name',
+                       description='Name of the package',
                        render_kw={'placeholder': 'Keypirinha-PackageControl', 'required': True},
                        validators=[validators.InputRequired()])
-    path = StringField('Path',
-                       description='Path to the .keypirinha-package file',
+    path = StringField('Path / URL',
+                       description='Path or URL to the .keypirinha-package file',
                        render_kw={'placeholder': 'path/to/package.keypirinha-package'},
-                       validators=[RequiredIf(type='GithubFile'),
+                       validators=[RequiredIf(type=AnyOf([src.__name__ for src in app.config["package_sources"] if src.path_required])),
                                    validators.Regexp(r'^.+\.keypirinha-package$',
                                                      message='Path must end with ".keypirinha-package"')])
 
@@ -65,7 +65,7 @@ class SubmitPackageForm(FlaskForm):
                 for condition_key, condition_value in required_if.conditions.items():
                     required_if_field = {
                         "if_field": condition_key,
-                        "if_field_value": condition_value,
+                        "if_field_value": condition_value.values,
                         "required": field_name
                     }
                     result.append(required_if_field)
