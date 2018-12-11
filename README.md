@@ -1,6 +1,7 @@
 # PackageControl-Server
 
-This a [Flask](http://flask.pocoo.org/) application to host a package repository for [Keypirinha-PackageControl](https://github.com/ueffel/Keypirinha-PackageControl).
+This a [Flask](http://flask.pocoo.org/) application to host a package repository for
+[Keypirinha-PackageControl](https://github.com/ueffel/Keypirinha-PackageControl).
 
 ## Installation
 * Download or clone the repository
@@ -12,9 +13,9 @@ This a [Flask](http://flask.pocoo.org/) application to host a package repository
   at http://localhost:9001/packagecontrol/)
 
 ## Using the repository
-* Open Browser and add packages
-* Change your Keypirinha-PackageControl configuration to your repository location (bottom of the
-  index page)
+* Open browser and add packages
+* Change your Keypirinha-PackageControl configuration to your repository's packages.json location
+  (if everything works its in the text field at the bottom of the index page)
 
 ## Advanced usage
 * Write a new packages source class to support your own way of providing packages
@@ -63,8 +64,12 @@ class WebFile(PackageSourceBase):
         # self.package.download_url   # url where the package can be downloaded
 
         try:
-            date_header = requests.head(self.package.path).headers["last-modified"]
-            date = dateutil.parser.parse(date_header)
+            resp = requests.head(self.package.path)
+            if "last-modified" in resp.headers:
+                date_header = resp.headers["last-modified"]
+                date = dateutil.parser.parse(date_header)
+            else:
+                date = None
             self.package.description = "Keypirinha package from: " + self.package.path
             self.package.filename = os.path.basename(self.package.path)
             self.package.date = date if date else self.package.added
