@@ -63,10 +63,8 @@ def packages_json():
     all_packages = []
     cached_packages = db_session.query(Package) \
         .filter(Package.last_updated.isnot(None),
-                or_(and_(Package.last_update_successful.is_(True),
-                         Package.last_updated >= datetime.utcnow() - timedelta(hours=24)),
-                    and_(Package.last_update_successful.is_(False),
-                         Package.last_updated >= datetime.utcnow() - timedelta(hours=4))))
+                or_(and_(Package.last_update_successful == True,
+                         Package.last_updated >= datetime.utcnow() - timedelta(hours=24))))
     all_packages.extend(cached_packages.all())
 
     update_packages = db_session.query(Package) \
@@ -177,10 +175,9 @@ async def update_package(package):
         return None
 
     source = source_type(package)
-    package.last_update_successful = source.update()
+    package.last_update_successful = await asyncio.get_event_loop().run_in_executor(None, source.update)
     package.last_updated = datetime.utcnow()
-    db_session.commit()
-    return package
+    return package if package.last_update_successful else None
 
 
 @app.teardown_appcontext

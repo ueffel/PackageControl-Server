@@ -21,8 +21,8 @@ class PackageSourceBase(object):
         raise NotImplementedError
 
     @staticmethod
-    def do_get_request(url, parameters=None):
-        req = requests.get(url, params=parameters, proxies=urllib.request.getproxies())
+    def do_get_request(url, parameters=None, auth=None):
+        req = requests.get(url, params=parameters, proxies=urllib.request.getproxies(), auth=auth)
         if req.status_code == 200:
             return req.text
         else:

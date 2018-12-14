@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.sql import func, or_
 from model.DB import Base
 
 

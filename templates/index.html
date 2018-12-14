@@ -28,7 +28,7 @@
                     <td>{{ package.owner }}</td>
                     <td><a href="{{ package.homepage }}">{{ package.name }}</a></td>
                     <td{{ {'title': ptype_descriptions[package.ptype]}|xmlattr }}>{{ package.ptype }}</td>
-                    <td title="{{ package.last_updated }}{{ ' UTC' if package.last_updated else '' }}" data-time="{{ package.last_updated }}">{{ package.last_updated }}</td>
+                    <td title="{{ package.last_updated if package.last_update_successful else '' }}{{ ' UTC' if package.last_update_successful else '' }}" data-time="{{ package.last_updated if package.last_update_successful else '' }}">{{ package.last_updated if package.last_update_successful else '' }}</td>
                     <td title="{{ package.added }}{{ ' UTC' if package.added else '' }}" data-time="{{ package.added }}">{{ package.added }}</td>
                     <td>
                         {% if package.updatable == 1 %}
