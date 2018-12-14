@@ -1,5 +1,6 @@
 from model.PackageSource.PackageSourceBase import PackageSourceBase
-from config import LOGGER
+from config import LOGGER, GITHUB_BASIC_AUTH_USER, GITHUB_BASIC_AUTH_TOKEN
+from requests.auth import HTTPBasicAuth
 import requests
 import json
 import dateutil.parser
@@ -18,11 +19,13 @@ class Github(PackageSourceBase):
     def update(self):
         try:
             api_url = "https://api.github.com/repos/{}/{}".format(self.package.owner, self.package.repo)
-            repo_info = json.loads(self.do_get_request(api_url))
+            auth = HTTPBasicAuth(GITHUB_BASIC_AUTH_USER, GITHUB_BASIC_AUTH_TOKEN) \
+                if GITHUB_BASIC_AUTH_USER and GITHUB_BASIC_AUTH_TOKEN else None
+            repo_info = json.loads(self.do_get_request(api_url, auth=auth))
             self.package.description = repo_info['description']
 
             request_url = "{}/releases".format(api_url)
-            releases = json.loads(self.do_get_request(request_url))
+            releases = json.loads(self.do_get_request(request_url, auth=auth))
             release_found = False
             for release in releases:
                 release_date = dateutil.parser.parse(release['published_at'], ignoretz=True)

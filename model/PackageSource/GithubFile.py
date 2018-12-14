@@ -1,5 +1,6 @@
 from model.PackageSource.PackageSourceBase import PackageSourceBase
-from config import LOGGER
+from requests.auth import HTTPBasicAuth
+from config import LOGGER, GITHUB_BASIC_AUTH_USER, GITHUB_BASIC_AUTH_TOKEN
 import requests
 import json
 import dateutil.parser
@@ -22,14 +23,16 @@ class GithubFile(PackageSourceBase):
         try:
             api_url = "https://api.github.com/repos/{}/{}".format(self.package.owner, self.package.repo)
             request_url = "{}/commits".format(api_url)
-            commit_json = json.loads(self.do_get_request(request_url, {'path': self.package.path}))
+            auth = HTTPBasicAuth(GITHUB_BASIC_AUTH_USER, GITHUB_BASIC_AUTH_TOKEN) \
+                if GITHUB_BASIC_AUTH_USER and GITHUB_BASIC_AUTH_TOKEN else None
+            commit_json = json.loads(self.do_get_request(request_url, {'path': self.package.path}, auth=auth))
             latest_commit = max(commit_json,
                                 key=lambda commit: dateutil.parser.parse(commit['commit']['committer']['date'],
                                                                          ignoretz=True))
             self.package.date = dateutil.parser.parse(latest_commit['commit']['committer']['date'], ignoretz=True)
 
             request_url2 = "{}/contents/{}".format(api_url, self.package.path)
-            file_json = json.loads(self.do_get_request(request_url2, {'ref': latest_commit['sha']}))
+            file_json = json.loads(self.do_get_request(request_url2, {'ref': latest_commit['sha']}, auth=auth))
             self.package.download_url = file_json['download_url']
             self.package.filename = file_json['name']
             return True

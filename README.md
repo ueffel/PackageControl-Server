@@ -7,7 +7,8 @@ This a [Flask](http://flask.pocoo.org/) application to host a package repository
 * Download or clone the repository
 * Run `pip install -r requirements.txt`
 * Copy or rename `config.py.template` to `config.py`
-* Edit `config.py` to configure application key, database storage and repository name
+* Edit `config.py` to configure application key, database storage and repository name (optionally
+  github basic auth to get around API limits)
 * Configure the wsgi server of your choice to serve `app` from the `packagecontrol.py` file or
   install [cheroot](https://pypi.org/project/Cheroot/) and just run `packagecontrol.py` (deployment
   at http://localhost:9001/packagecontrol/)

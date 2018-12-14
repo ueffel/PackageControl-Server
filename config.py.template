@@ -28,3 +28,7 @@ SECRET_KEY = b""
 
 # Name of the package repository
 REPO_NAME = "My super awesome package repository"
+
+# Github basic auth to get around API limits
+GITHUB_BASIC_AUTH_USER = ""
+GITHUB_BASIC_AUTH_TOKEN = ""

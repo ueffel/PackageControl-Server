@@ -28,8 +28,8 @@
                     <td>{{ package.owner }}</td>
                     <td><a href="{{ package.homepage }}">{{ package.name }}</a></td>
                     <td{{ {'title': ptype_descriptions[package.ptype]}|xmlattr }}>{{ package.ptype }}</td>
-                    <td title="{{ package.last_updated if package.last_update_successful else '' }}{{ ' UTC' if package.last_update_successful else '' }}" data-time="{{ package.last_updated if package.last_update_successful else '' }}">{{ package.last_updated if package.last_update_successful else '' }}</td>
-                    <td title="{{ package.added }}{{ ' UTC' if package.added else '' }}" data-time="{{ package.added }}">{{ package.added }}</td>
+                    <td title="{{ package.last_updated.isoformat(timespec='seconds') if package.last_update_successful else '' }}{{ ' UTC' if package.last_update_successful else '' }}" data-time="{{ package.last_updated if package.last_update_successful else '' }}">{{ package.last_updated.isoformat(timespec='seconds') if package.last_update_successful else '' }}</td>
+                    <td title="{{ package.added.isoformat(timespec='seconds') }}{{ ' UTC' if package.added else '' }}" data-time="{{ package.added }}">{{ package.added.isoformat(timespec='seconds') }}</td>
                     <td>
                         {% if package.updatable == 1 %}
                         <a href="{{ url_for('update_package_by_id', package_id=package.pid) }}" title="update this package">&#x21bb;</a>
