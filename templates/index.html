@@ -44,5 +44,27 @@
             <input type="text" size="80" value="{{ repo_url }}" onfocus="this.select()" />
         </p>
         <p>Wanna submit your own package? Do it <a href="{{ url_for('new_package') }}">here</a></p>
+        <script>
+            window.onload = function()
+            {
+                let table = document.getElementsByTagName('table')[0];
+                let rows =  [].slice.call(table.getElementsByTagName('tr')).slice(1);
+                for(let i = 0; i < rows.length; i++)
+                {
+                    let tempdate = new Date(rows[i].getElementsByTagName('td')[3].getAttribute('data-time'));
+                    tempdate.setTime(tempdate.getTime() - new Date().getTimezoneOffset()*60000)
+                    if (tempdate && tempdate.getTime())
+                    {
+                        rows[i].getElementsByTagName('td')[3].innerHTML = makeRelativeTime(tempdate);
+                    }
+                    tempdate = new Date(rows[i].getElementsByTagName('td')[4].getAttribute('data-time'));
+                    tempdate.setTime(tempdate.getTime() - new Date().getTimezoneOffset()*60000)
+                    if (tempdate && tempdate.getTime())
+                    {
+                        rows[i].getElementsByTagName('td')[4].innerHTML = makeRelativeTime(tempdate);
+                    }
+                }
+            };
+        </script>
     </body>
 </html>

@@ -107,23 +107,10 @@ function makeRelativeTime(date)
     }
 }
 
-window.onload = function()
+function showTooltip(event, field_id)
 {
-    let table = document.getElementsByTagName('table')[0];
-    let rows =  [].slice.call(table.getElementsByTagName('tr')).slice(1);
-    for(let i = 0; i < rows.length; i++)
-    {
-        let tempdate = new Date(rows[i].getElementsByTagName('td')[3].getAttribute('data-time'));
-        tempdate.setTime(tempdate.getTime() - new Date().getTimezoneOffset()*60000)
-        if (tempdate && tempdate.getTime())
-        {
-            rows[i].getElementsByTagName('td')[3].innerHTML = makeRelativeTime(tempdate);
-        }
-        tempdate = new Date(rows[i].getElementsByTagName('td')[4].getAttribute('data-time'));
-        tempdate.setTime(tempdate.getTime() - new Date().getTimezoneOffset()*60000)
-        if (tempdate && tempdate.getTime())
-        {
-            rows[i].getElementsByTagName('td')[4].innerHTML = makeRelativeTime(tempdate);
-        }
-    }
-};
+    let field_tooltip = document.getElementById(field_id+"_tooltip");
+    field_tooltip.style.left = event.clientX + "px";
+    field_tooltip.style.top = event.clientY + "px";
+}
+

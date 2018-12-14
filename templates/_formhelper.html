@@ -1,7 +1,18 @@
 {% macro render_field(field) %}
     <div>
         {{ field.label }}
-        {{ field(title=field.description, **kwargs)|safe }}
+        {{ field(title=field.description["short"], **kwargs)|safe }}
+        {% if "long" in field.description %}
+            <span class="question_mark" onmousemove="showTooltip(event, '{{ field.id }}')">?</span>
+            <div class="tooltip" id="{{ field.id }}_tooltip">
+                {% for type, long_desc in field.description["long"].items() %}
+                <p>
+                    <span class="tooltip_bold">{{ type }}:</span>
+                    <span>{{ long_desc }}</span>
+                </p>
+                {% endfor %}
+            </div>
+        {% endif %}
         {% if field.errors %}
             <dl class="errors">
                 <dt>Field errors:</dt>

@@ -11,17 +11,18 @@ class SubmitPackageForm(FlaskForm):
     type = SelectField('Repository Type',
                        choices=[('', '-- Choose Repo Type --')] + [(src.__name__, src.__name__)
                                                                    for src in app.config["package_sources"]],
+                       description={"long": app.config["package_sources_long_descriptions"]},
                        validators=[validators.InputRequired()])
     owner = StringField('Author / Owner',
-                        description='Name of the package repository owner or author',
+                        description={"short": 'Name of the package repository owner or author'},
                         render_kw={'placeholder': 'ueffel', 'required': True},
                         validators=[validators.InputRequired()])
     repo = StringField('Repository / Name',
-                       description='Name of the package',
+                       description={"short": 'Name of the package'},
                        render_kw={'placeholder': 'Keypirinha-PackageControl', 'required': True},
                        validators=[validators.InputRequired()])
     path = StringField('Path / URL',
-                       description='Path or URL to the .keypirinha-package file',
+                       description={"short": 'Path or URL to the .keypirinha-package file'},
                        render_kw={'placeholder': 'path/to/package.keypirinha-package'},
                        validators=[RequiredIf(type=AnyOf([src.__name__ for src in app.config["package_sources"] if src.path_required])),
                                    validators.Regexp(r'^.+\.keypirinha-package$',

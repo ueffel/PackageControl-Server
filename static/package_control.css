@@ -39,7 +39,7 @@ form div
 }
 form label
 {
-    width: 30%;
+    width: 25%;
     text-align: right;
     display: inline-block;
     margin-right: 5px;
@@ -51,4 +51,38 @@ form input
 .errors
 {
     color: red;
+}
+span.question_mark
+{
+    display: inline-block;
+    border: 1px solid black;
+    width: 1.2em;
+    height: 1.2em;
+    text-align: center;
+    border-radius: 1em;
+    background-color: #EEFFEE;
+}
+.tooltip
+{
+    display: none;
+}
+.tooltip_bold
+{
+    font-weight: bold;
+}
+
+span.question_mark:hover ~ .tooltip
+{
+    display: block;
+    position: fixed;
+    z-index: 1;
+    background-color: #EEFFEE;
+    width: 30%;
+    height: auto;
+    overflow:hidden;
+    padding: 0px 15px;
+}
+span.question_mark:hover ~ .tooltip p
+{
+    text-align: left;
 }

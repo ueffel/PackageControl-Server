@@ -35,8 +35,13 @@ from config import LOGGER
 
 
 class WebFile(PackageSourceBase):
-    description = "Just a URL to a Package"  # Description of the package source
-    path_required = True                     # determines if the "path" field is displayed in the submit form
+    # Description of the package source
+    description = "Just a URL to a Package"
+    # Long description to be shown in the submission form
+    long_description = "The download URL will point directly to submitted path and the date will be the last-modified" \
+                       " HTTP header if its provided by the source. The author, name and complete URL is needed."
+    # Determines if the "path" field is displayed in the submit form
+    path_required = True
 
     def __init__(self, package):
         """The following attributes are set from the submit from

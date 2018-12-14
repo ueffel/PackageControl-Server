@@ -26,11 +26,14 @@ def get_package_sources():
             package_sources.append(source)
     package_sources_descriptions.update(
         {package_type.__name__: package_type.description for package_type in package_sources})
+    package_sources_long_descriptions.update(
+        {package_type.__name__: package_type.long_description for package_type in package_sources})
 
 
 LOGGER.debug("collecting packages sources")
 package_sources = []
 package_sources_descriptions = {}
+package_sources_long_descriptions = {}
 get_package_sources()
 LOGGER.debug("creating app")
 app = Flask(__name__)
@@ -38,6 +41,7 @@ app.jinja_env.trim_blocks = True
 app.jinja_env.lstrip_blocks = True
 app.config["package_sources"] = package_sources
 app.config["package_sources_descriptions"] = package_sources_descriptions
+app.config["package_sources_long_descriptions"] = package_sources_long_descriptions
 app.secret_key = SECRET_KEY
 LOGGER.debug("initializing db")
 init_db()
