@@ -108,7 +108,7 @@ def packages_json():
             "download_url": package.download_url,
             "name": package.name,
             "filename": package.filename,
-            "date": package.date.isoformat(timespec="seconds"),
+            "date": package.date.isoformat(),
             "description": package.description,
             "version": package.version,
             "owner": package.owner,
@@ -118,7 +118,7 @@ def packages_json():
     ]
 
     return jsonify(name=REPO_NAME,
-                   last_updated=last_updated.isoformat(timespec="seconds") if last_updated else "",
+                   last_updated=last_updated.isoformat() if last_updated else "",
                    packages=packages_serialized)
 
 
