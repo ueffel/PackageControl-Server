@@ -3,6 +3,11 @@
 This a [Flask](http://flask.pocoo.org/) application to host a package repository for
 [Keypirinha-PackageControl](https://github.com/ueffel/Keypirinha-PackageControl).
 
+## Requirements
+* Python >= 3.5
+* pip (to install the needed packages)
+* wsgi server to serve the app
+
 ## Installation
 * Download or clone the repository
 * Run `pip install -r requirements.txt`
@@ -12,6 +17,39 @@ This a [Flask](http://flask.pocoo.org/) application to host a package repository
 * Configure the wsgi server of your choice to serve `app` from the `packagecontrol.py` file or
   install [cheroot](https://pypi.org/project/Cheroot/) and just run `packagecontrol.py` (deployment
   at http://localhost:9001/packagecontrol/)
+
+
+Example configuration for [uwsgi](http://projects.unbit.it/uwsgi) with [nginx](https://nginx.org/):
+
+packagecontrol.ini
+```ini
+[uwsgi]
+plugin = http,python3
+pythonpath = /usr/local/lib/python3.5/dist-packages
+chdir = /var/www/packagecontrol
+mount = /packagecontrol=/var/www/packagecontrol/packagecontrol.py
+callable = app
+manage-script-name = true
+```
+
+nginx conf snippet:
+```nginx
+location /packagecontrol/ {
+    try_files does_not_exist @packagecontrol;
+}
+
+location /packagecontrol/static/ {
+    root /var/www;
+    try_files $uri @packagecontrol;
+}
+
+location @packagecontrol {
+    include uwsgi_params;
+    uwsgi_pass unix:/var/run/uwsgi/app/packagecontrol/socket;
+    uwsgi_param SCRIPT_NAME /packagecontrol;
+    uwsgi_modifier1 30;
+}
+```
 
 ## Using the repository
 * Open browser and add packages
