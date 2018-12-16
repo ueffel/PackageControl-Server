@@ -34,7 +34,7 @@ manage-script-name = true
 
 nginx conf snippet:
 ```nginx
-location /packagecontrol/ {
+location /packagecontrol {
     try_files does_not_exist @packagecontrol;
 }
 
