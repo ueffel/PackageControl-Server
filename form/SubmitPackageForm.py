@@ -24,7 +24,8 @@ class SubmitPackageForm(FlaskForm):
     path = StringField("Path / URL",
                        description={"short": "Path or URL to the .keypirinha-package file"},
                        render_kw={"placeholder": "path/to/package.keypirinha-package"},
-                       validators=[RequiredIf(type=AnyOf([src.__name__ for src in app.config["package_sources"] if src.path_required])),
+                       validators=[RequiredIf(type=AnyOf([src.__name__ for src in app.config["package_sources"]
+                                                          if src.path_required])),
                                    validators.Regexp(r"^.+\.keypirinha-package$",
                                                      message='Path must end with ".keypirinha-package"')])
 

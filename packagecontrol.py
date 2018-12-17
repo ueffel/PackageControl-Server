@@ -3,7 +3,7 @@ import asyncio
 import traceback
 import model.PackageSource
 from flask import Flask, redirect, jsonify, render_template, url_for, request
-from sqlalchemy import or_, and_, func
+from sqlalchemy import or_, and_
 from sqlalchemy.orm import defer
 from datetime import datetime, timedelta
 from model.DB import db_session, init_db
@@ -67,7 +67,7 @@ def packages_json():
     all_packages = []
     cached_packages = db_session.query(Package) \
         .filter(Package.last_updated.isnot(None),
-                or_(and_(Package.last_update_successful == True,
+                or_(and_(Package.last_update_successful.is_(True),
                          Package.last_updated >= datetime.utcnow() - timedelta(hours=24))))
     all_packages.extend(cached_packages.all())
 
