@@ -70,7 +70,6 @@ span.question_mark
 {
     font-weight: bold;
 }
-
 span.question_mark:hover ~ .tooltip
 {
     display: block;

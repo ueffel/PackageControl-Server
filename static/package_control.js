@@ -113,4 +113,3 @@ function showTooltip(event, field_id)
     field_tooltip.style.left = event.clientX + "px";
     field_tooltip.style.top = event.clientY + "px";
 }
-

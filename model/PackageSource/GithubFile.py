@@ -28,16 +28,16 @@ class GithubFile(PackageSourceBase):
             request_url = "{}/commits".format(api_url)
             auth = HTTPBasicAuth(GITHUB_BASIC_AUTH_USER, GITHUB_BASIC_AUTH_TOKEN) \
                 if GITHUB_BASIC_AUTH_USER and GITHUB_BASIC_AUTH_TOKEN else None
-            commit_json = json.loads(self.do_get_request(request_url, {'path': self.package.path}, auth=auth))
+            commit_json = json.loads(self.do_get_request(request_url, {"path": self.package.path}, auth=auth))
             latest_commit = max(commit_json,
-                                key=lambda commit: dateutil.parser.parse(commit['commit']['committer']['date'],
+                                key=lambda commit: dateutil.parser.parse(commit["commit"]["committer"]["date"],
                                                                          ignoretz=True))
-            self.package.date = dateutil.parser.parse(latest_commit['commit']['committer']['date'], ignoretz=True)
+            self.package.date = dateutil.parser.parse(latest_commit["commit"]["committer"]["date"], ignoretz=True)
 
             request_url2 = "{}/contents/{}".format(api_url, self.package.path)
-            file_json = json.loads(self.do_get_request(request_url2, {'ref': latest_commit['sha']}, auth=auth))
-            self.package.download_url = file_json['download_url']
-            self.package.filename = file_json['name']
+            file_json = json.loads(self.do_get_request(request_url2, {"ref": latest_commit["sha"]}, auth=auth))
+            self.package.download_url = file_json["download_url"]
+            self.package.filename = file_json["name"]
             return True
         except Exception as ex:
             LOGGER.error(ex, traceback.format_exc())

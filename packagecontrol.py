@@ -55,10 +55,10 @@ def index():
                                                  defer(Package.date),
                                                  defer(Package.version),
                                                  defer(Package.download_url)).all()
-    return render_template('index.html',
+    return render_template("index.html",
                            title="{} ({} packages)".format(REPO_NAME, len(packages)),
                            packages=packages,
-                           repo_url=url_for('packages_json', _external=True),
+                           repo_url=url_for("packages_json", _external=True),
                            ptype_descriptions=package_sources_descriptions)
 
 
@@ -122,19 +122,19 @@ def packages_json():
                    packages=packages_serialized)
 
 
-@app.route("/new_package", methods=['GET', 'POST'])
+@app.route("/new_package", methods=["GET", "POST"])
 def new_package():
     from form.SubmitPackageForm import SubmitPackageForm
     form = SubmitPackageForm()
 
     required_if_fields = form.required_if_fields()
 
-    if request.method == 'POST' and form.validate():
+    if request.method == "POST" and form.validate():
         insert_package(form.owner.data, form.repo.data, form.type.data, form.path.data if form.path.data else None)
-        return redirect(url_for('index'))
+        return redirect(url_for("index"))
 
-    return render_template('new_package.html',
-                           title='Submit a new package to {}'.format(REPO_NAME),
+    return render_template("new_package.html",
+                           title="Submit a new package to {}".format(REPO_NAME),
                            form=form,
                            required_if_fields=required_if_fields)
 
@@ -159,7 +159,7 @@ def update_package_by_id(package_id):
         finally:
             loop.close()
 
-    return redirect(url_for('index'))
+    return redirect(url_for("index"))
 
 
 def insert_package(owner, repo, ptype, path=None):

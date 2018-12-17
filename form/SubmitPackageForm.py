@@ -8,24 +8,24 @@ from model.Package import Package
 
 
 class SubmitPackageForm(FlaskForm):
-    type = SelectField('Repository Type',
-                       choices=[('', '-- Choose Repo Type --')] + [(src.__name__, src.__name__)
+    type = SelectField("Repository Type",
+                       choices=[("", "-- Choose Repo Type --")] + [(src.__name__, src.__name__)
                                                                    for src in app.config["package_sources"]],
                        description={"long": app.config["package_sources_long_descriptions"]},
                        validators=[validators.InputRequired()])
-    owner = StringField('Author / Owner',
-                        description={"short": 'Name of the package repository owner or author'},
-                        render_kw={'placeholder': 'ueffel', 'required': True},
+    owner = StringField("Author / Owner",
+                        description={"short": "Name of the package repository owner or author"},
+                        render_kw={"placeholder": "ueffel", "required": True},
                         validators=[validators.InputRequired()])
-    repo = StringField('Repository / Name',
-                       description={"short": 'Name of the package'},
-                       render_kw={'placeholder': 'Keypirinha-PackageControl', 'required': True},
+    repo = StringField("Repository / Name",
+                       description={"short": "Name of the package"},
+                       render_kw={"placeholder": "Keypirinha-PackageControl", "required": True},
                        validators=[validators.InputRequired()])
-    path = StringField('Path / URL',
-                       description={"short": 'Path or URL to the .keypirinha-package file'},
-                       render_kw={'placeholder': 'path/to/package.keypirinha-package'},
+    path = StringField("Path / URL",
+                       description={"short": "Path or URL to the .keypirinha-package file"},
+                       render_kw={"placeholder": "path/to/package.keypirinha-package"},
                        validators=[RequiredIf(type=AnyOf([src.__name__ for src in app.config["package_sources"] if src.path_required])),
-                                   validators.Regexp(r'^.+\.keypirinha-package$',
+                                   validators.Regexp(r"^.+\.keypirinha-package$",
                                                      message='Path must end with ".keypirinha-package"')])
 
     @staticmethod
@@ -44,7 +44,7 @@ class SubmitPackageForm(FlaskForm):
                                self.repo.data,
                                self.type.data,
                                self.path.data if self.path.data else None):
-            self._errors = ['This package already exists in the repository']
+            self._errors = ["This package already exists in the repository"]
             return False
 
         package = Package(self.owner.data, self.repo.data, self.type.data, self.path.data)
@@ -53,7 +53,7 @@ class SubmitPackageForm(FlaskForm):
         source = source_type(package)
 
         if not source.is_available():
-            self._errors = ['The package source is not available.']
+            self._errors = ["The package source is not available."]
             return False
 
         return True
