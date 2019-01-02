@@ -20,6 +20,7 @@
                     <th onclick="sortTable(this)">Owner</th>
                     <th onclick="sortTable(this)">Name</th>
                     <th onclick="sortTable(this)">Type</th>
+                    <th onclick="sortTable(this)">Version</th>
                     <th onclick="sortTable(this)">Last updated</th>
                     <th onclick="sortTable(this)">Added</th>
                     <th onclick="sortTable(this)"></th>
@@ -29,6 +30,7 @@
                     <td>{{ package.owner }}</td>
                     <td><a href="{{ package.homepage }}">{{ package.name }}</a></td>
                     <td{{ {'title': ptype_descriptions[package.ptype]}|xmlattr }}>{{ package.ptype }}</td>
+                    <td>{{ package.version }}</td>
                     <td title="{{ package.last_updated.isoformat() if package.last_update_successful else '' }}{{ ' UTC' if package.last_update_successful else '' }}" data-time="{{ package.last_updated if package.last_update_successful else '' }}">{{ package.last_updated.isoformat() if package.last_update_successful else '' }}</td>
                     <td title="{{ package.added.isoformat() }}{{ ' UTC' if package.added else '' }}" data-time="{{ package.added }}">{{ package.added.isoformat() }}</td>
                     <td>
@@ -52,17 +54,17 @@
                 let rows =  [].slice.call(table.getElementsByTagName('tr')).slice(1);
                 for(let i = 0; i < rows.length; i++)
                 {
-                    let tempdate = new Date(rows[i].getElementsByTagName('td')[3].getAttribute('data-time'));
-                    tempdate.setTime(tempdate.getTime() - new Date().getTimezoneOffset()*60000)
-                    if (tempdate && tempdate.getTime())
-                    {
-                        rows[i].getElementsByTagName('td')[3].innerHTML = makeRelativeTime(tempdate);
-                    }
-                    tempdate = new Date(rows[i].getElementsByTagName('td')[4].getAttribute('data-time'));
+                    let tempdate = new Date(rows[i].getElementsByTagName('td')[4].getAttribute('data-time'));
                     tempdate.setTime(tempdate.getTime() - new Date().getTimezoneOffset()*60000)
                     if (tempdate && tempdate.getTime())
                     {
                         rows[i].getElementsByTagName('td')[4].innerHTML = makeRelativeTime(tempdate);
+                    }
+                    tempdate = new Date(rows[i].getElementsByTagName('td')[5].getAttribute('data-time'));
+                    tempdate.setTime(tempdate.getTime() - new Date().getTimezoneOffset()*60000)
+                    if (tempdate && tempdate.getTime())
+                    {
+                        rows[i].getElementsByTagName('td')[5].innerHTML = makeRelativeTime(tempdate);
                     }
                 }
             };

@@ -117,7 +117,7 @@ class WebFile(PackageSourceBase):
             self.package.description = "Keypirinha package from: " + self.package.path
             self.package.filename = os.path.basename(self.package.path)
             self.package.date = date if date else self.package.added
-            self.package.version = ""
+            self.package.version = "1.0.0+" + self.package.date.strftime("%Y%m%d%H%M")
             self.package.download_url = self.package.path
             return True
         except Exception as exc:

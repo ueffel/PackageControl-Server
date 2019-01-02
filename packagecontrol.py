@@ -53,7 +53,6 @@ def index():
                                                  defer(Package.description),
                                                  defer(Package.filename),
                                                  defer(Package.date),
-                                                 defer(Package.version),
                                                  defer(Package.download_url)).all()
     return render_template("index.html",
                            title="{} ({} packages)".format(REPO_NAME, len(packages)),
@@ -83,7 +82,6 @@ def packages_json():
     update_tasks = [asyncio.ensure_future(update_package(package)) for package in update_packages]
     update = asyncio.gather(*update_tasks, return_exceptions=True)
     loop.run_until_complete(update)
-    loop.close()
 
     for update_task in update_tasks:
         exc = update_task.exception()
@@ -94,6 +92,8 @@ def packages_json():
         updated_package = update_task.result()
         if updated_package:
             all_packages.append(updated_package)
+
+    loop.close()
 
     if update_tasks:
         last_updated_prop = Property("last_updated", date_val=datetime.utcnow())

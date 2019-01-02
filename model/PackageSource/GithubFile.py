@@ -38,6 +38,7 @@ class GithubFile(PackageSourceBase):
             file_json = json.loads(self.do_get_request(request_url2, {"ref": latest_commit["sha"]}, auth=auth))
             self.package.download_url = file_json["download_url"]
             self.package.filename = file_json["name"]
+            self.package.version = "1.0.0+" + latest_commit["sha"][:7]
             return True
         except Exception as ex:
             LOGGER.error(ex, traceback.format_exc())
