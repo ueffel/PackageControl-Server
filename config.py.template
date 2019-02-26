@@ -13,10 +13,12 @@ SECRET_KEY = b""
 # There are multiple storage choices. In theory you can use everything sqlalchemy supports but only
 # SQLite and MariaDB are tested
 #
+
 # SQLite
 # Uncomment the following 2 lines to use SQLite as storage.
 #path = "packages.db"
 #DATABASE_URI = "sqlite:///{}".format(path)  # DO NOT CHANGE THIS
+
 
 # MySQL/MariaDB
 # Uncomment the following 5 lines for your setup to use MySQL or MariaDB as storage (pymysql is needed)
@@ -24,10 +26,17 @@ SECRET_KEY = b""
 #password = "pw"
 #host = "localhost"
 #database = "packagecontrol"
+
+# pip install mysqlclient
+#DATABASE_URI = "mysql+mysqldb://{}:{}@{}/{}".format(username, password, host, database)  # DO NOT CHANGE THIS
+
+# pip install pymysql
 #DATABASE_URI = "mysql+pymysql://{}:{}@{}/{}?charset=utf8mb4".format(username, password, host, database)  # DO NOT CHANGE THIS
+
 
 # Name of the package repository
 REPO_NAME = "My super awesome package repository"
+
 
 # Github basic auth to get around API limits
 GITHUB_BASIC_AUTH_USER = ""

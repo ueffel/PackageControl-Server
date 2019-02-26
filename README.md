@@ -82,7 +82,7 @@ class WebFile(PackageSourceBase):
     path_required = True
 
     def __init__(self, package):
-        """The following attributes are set from the submit from
+        """The following attributes are set from the submit form
         self.package.type
         self.package.owner
         self.package.repo

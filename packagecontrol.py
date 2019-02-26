@@ -10,6 +10,7 @@ from model.DB import db_session, init_db
 from model.Package import Package
 from model.Property import Property
 from config import REPO_NAME, LOGGER, SECRET_KEY
+from model.PackageSource import PackageSourceBase
 from model.PackageSource import *
 
 
