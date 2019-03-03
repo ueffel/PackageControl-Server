@@ -53,7 +53,6 @@ def index():
     packages = db_session.query(Package).options(defer(Package.repo),
                                                  defer(Package.description),
                                                  defer(Package.filename),
-                                                 defer(Package.date),
                                                  defer(Package.download_url)).all()
     return render_template("index.html",
                            title="{} ({} packages)".format(REPO_NAME, len(packages)),

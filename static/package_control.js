@@ -76,11 +76,10 @@ function sortTable(header, sortDirection)
 
 function makeRelativeTime(date)
 {
-    let date_str;
     let now = Date.now();
     let diff = now - date;
 
-    if (diff >= 3600 * 23 * 1000)
+    if (diff >= 3600 * 24 * 1000)
     {
         return date.toLocaleString();
     }
@@ -89,18 +88,27 @@ function makeRelativeTime(date)
         let hours = new Date(diff).getUTCHours();
         let minutes = new Date(diff).getUTCMinutes();
         let seconds = new Date(diff).getSeconds();
-        date_str = "";
+        let date_str;
+
         if (hours > 0)
         {
-            date_str += hours + " hours";
+            date_str = hours + " hours";
+            if (minutes > 0)
+            {
+                date_str += " " + minutes + " minutes";
+            }
         }
         else if (minutes > 0)
         {
-            date_str += minutes + " minutes";
+            date_str = minutes + " minutes"
+            if (seconds > 0)
+            {
+                date_str +=  " " + seconds + " seconds";
+            }
         }
-        else if (seconds > 0)
+        else
         {
-            date_str += seconds + " seconds";
+            date_str = seconds + " seconds";
         }
         date_str += " ago";
         return date_str;
@@ -109,7 +117,7 @@ function makeRelativeTime(date)
 
 function showTooltip(event, field_id)
 {
-    let field_tooltip = document.getElementById(field_id+"_tooltip");
+    let field_tooltip = document.getElementById(field_id + "_tooltip");
     field_tooltip.style.left = event.clientX + "px";
     field_tooltip.style.top = event.clientY + "px";
 }
