@@ -9,6 +9,9 @@ LOGGER.setLevel(logging.INFO)
 # Generate with os.urandom(32)
 SECRET_KEY = b""
 
+# Admin Password (required for synchronizing between mirrors)
+ADMIN_PW = ""
+
 # Storage configuration
 # There are multiple storage choices. In theory you can use everything sqlalchemy supports but only
 # SQLite and MariaDB are tested

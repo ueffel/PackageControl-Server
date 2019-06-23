@@ -57,6 +57,16 @@ location @packagecontrol {
   (if everything works its in the text field at the bottom of the index page)
 
 ## Advanced usage
+* Use the `/sync/`, `/sync/start/`, `/sync/mirrors/`, `/sync/add_mirror/<url>` and
+  `/sync/delete_mirror/<key>` end points to synchronize with another repository (Secured with basic
+  authentication with username "admin" and password configurable with `ADMIN_PW` setting)
+    * `/sync/` is the endpoint for mirrors to get the all packages (not secured)
+    * `/sync/mirrors/` lists all configured mirrors in the format `key: url`
+    * `/sync/add_mirror/<url>` checks and adds `url` as a mirror (should be the `/sync/` endpoint of
+      another repository, e.g. https://ue.spdns.de/packagecontrol/sync/)
+    * `/sync/start/` starts the synchronisation process
+    * `/sync/delete_mirror/<key>` removes a mirror (`key` from `/sync/mirrors/` endpoint, e.g.
+      MIRROR_0)
 * Write a new packages source class to support your own way of providing packages
 * Inherit from PackageSourceBase and implement `update` and `is_available`
 * Look at the other sources for some implementation pointers
