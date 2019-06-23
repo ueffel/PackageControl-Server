@@ -5,7 +5,7 @@ import requests
 import traceback
 import model.PackageSource
 from flask import Flask, redirect, jsonify, render_template, url_for, request, Response, stream_with_context
-from sqlalchemy import or_, and_
+from sqlalchemy import or_, and_, not_
 from sqlalchemy.orm import defer, load_only
 from datetime import datetime, timedelta
 from model.DB import db_session, init_db
@@ -66,36 +66,66 @@ def index():
 
 @app.route("/packages.json")
 def packages_json():
-    all_packages = []
+    return Response(stream_with_context(packages_json_generate()), 200, mimetype="application/json")
+
+
+def packages_json_generate():
+    yield '{{"name":"{}","packages":['.format(REPO_NAME)
+
     cached_packages = db_session.query(Package) \
         .filter(Package.last_updated.isnot(None),
-                or_(and_(Package.last_update_successful.is_(True),
-                         Package.last_updated >= datetime.utcnow() - timedelta(hours=24))))
-    all_packages.extend(cached_packages.all())
+                or_(and_(Package.last_update_successful,
+                         Package.last_updated >= datetime.utcnow() - timedelta(hours=24)))) \
+        .options(load_only(Package.owner,
+                           Package.name,
+                           Package.description,
+                           Package.filename,
+                           Package.date,
+                           Package.version,
+                           Package.download_url,
+                           Package.homepage))
+    iter_cached_packages = iter(cached_packages)
+    package = next(iter_cached_packages, None)
+    if package:
+        yield json_dump_package(package)
+    for package in iter_cached_packages:
+        yield "," + json_dump_package(package)
 
     update_packages = db_session.query(Package) \
         .filter(or_(Package.last_updated.is_(None),
-                    and_(Package.last_update_successful.is_(True),
+                    and_(Package.last_update_successful,
                          Package.last_updated < datetime.utcnow() - timedelta(hours=24)),
-                    and_(Package.last_update_successful.is_(False),
-                         Package.last_updated < datetime.utcnow() - timedelta(hours=4))))
-
+                    and_(not_(Package.last_update_successful),
+                         Package.last_updated < datetime.utcnow() - timedelta(hours=4)))) \
+        .options(load_only(Package.owner,
+                           Package.repo,
+                           Package.path,
+                           Package.ptype,
+                           Package.date))
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     update_tasks = [asyncio.ensure_future(update_package(package)) for package in update_packages]
-    update = asyncio.gather(*update_tasks, return_exceptions=True)
-    loop.run_until_complete(update)
-
-    for update_task in update_tasks:
-        exc = update_task.exception()
-        if exc:
-            LOGGER.error(exc)
-            LOGGER.debug("".join(traceback.format_exception(exc.__class__, exc, exc.__traceback__)))
+    iter_update_tasks = asyncio.as_completed(update_tasks)
+    if not package:
+        update_task = next(iter_update_tasks, None)
+        if update_task:
+            updated_package = None
+            try:
+                updated_package = loop.run_until_complete(update_task)
+            except Exception as ex:
+                LOGGER.error(ex)
+                LOGGER.debug(traceback.format_exc())
+            if updated_package:
+                yield json_dump_package(updated_package)
+    for update_task in iter_update_tasks:
+        try:
+            updated_package = loop.run_until_complete(update_task)
+        except Exception as ex:
+            LOGGER.error(ex)
+            LOGGER.debug(traceback.format_exc())
             continue
-        updated_package = update_task.result()
         if updated_package:
-            all_packages.append(updated_package)
-
+            yield "," + json_dump_package(updated_package)
     loop.close()
 
     if update_tasks:
@@ -106,23 +136,20 @@ def packages_json():
     else:
         last_updated = db_session.query(Property.date_val).filter(Property.identifier == "last_updated").scalar()
 
-    packages_serialized = [
-        {
-            "download_url": package.download_url,
-            "name": package.name,
-            "filename": package.filename,
-            "date": package.date.isoformat(),
-            "description": package.description,
-            "version": package.version,
-            "owner": package.owner,
-            "homepage": package.homepage
-        }
-        for package in all_packages
-    ]
+    yield '],"last_updated":"{}"}}'.format(last_updated.isoformat() if last_updated else "")
 
-    return jsonify(name=REPO_NAME,
-                   last_updated=last_updated.isoformat() if last_updated else "",
-                   packages=packages_serialized)
+
+def json_dump_package(package):
+    return json.dumps({
+        "date": package.date.isoformat(),
+        "description": package.description,
+        "download_url": package.download_url,
+        "filename": package.filename,
+        "homepage": package.homepage,
+        "name": package.name,
+        "owner": package.owner,
+        "version": package.version
+    }, separators=(',', ':'))
 
 
 @app.route("/new_package", methods=["GET", "POST"])
@@ -147,7 +174,13 @@ def update_package_by_id(package_id):
     package = db_session.query(Package) \
         .filter(Package.pid == package_id,
                 or_(Package.last_updated.is_(None),
-                    Package.last_updated <= datetime.utcnow() - timedelta(hours=2))).first()
+                    Package.last_updated <= datetime.utcnow() - timedelta(hours=2))) \
+        .options(load_only(Package.owner,
+                           Package.repo,
+                           Package.path,
+                           Package.ptype,
+                           Package.date)) \
+        .first()
     if package:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)

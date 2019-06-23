@@ -48,7 +48,8 @@ class Github(PackageSourceBase):
                 LOGGER.error("No release found in repo: %s: %s", self.package.owner, self.package.repo)
                 return False
         except Exception as ex:
-            LOGGER.error(ex, traceback.format_exc())
+            LOGGER.error(ex)
+            LOGGER.debug(traceback.format_exc())
             return False
 
         return True

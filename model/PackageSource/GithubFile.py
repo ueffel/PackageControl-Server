@@ -20,7 +20,7 @@ class GithubFile(PackageSourceBase):
         self.package.name = os.path.splitext(os.path.basename(self.package.path))[0]
         self.package.homepage = "https://github.com/{}/{}/tree/master/{}".format(self.package.owner,
                                                                                  self.package.repo,
-                                                                                 self.package.path)
+                                                                                 self.package.path.lstrip("/"))
 
     def update(self):
         try:
@@ -41,11 +41,14 @@ class GithubFile(PackageSourceBase):
             self.package.version = "1.0.0+" + latest_commit["sha"][:7]
             return True
         except Exception as ex:
-            LOGGER.error(ex, traceback.format_exc())
+            LOGGER.error(ex)
+            LOGGER.debug(traceback.format_exc())
             return False
 
     def is_available(self):
-        url = "https://github.com/{}/{}/blob/master/{}".format(self.package.owner, self.package.repo, self.package.path)
+        url = "https://github.com/{}/{}/blob/master/{}".format(self.package.owner,
+                                                               self.package.repo,
+                                                               self.package.path.lstrip("/"))
         req = requests.head(url)
         if req.status_code == 200:
             return True
