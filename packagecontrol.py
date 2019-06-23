@@ -341,17 +341,26 @@ def sync_mirrors():
                     mimetype="text/plain")
 
 
-@app.route("/sync/add_mirror/<path:url>")
-def add_mirror(url):
+@app.route("/sync/add_mirror/")
+def add_mirror():
     auth_check = check_auth()
     if auth_check:
         return auth_check
 
-    resp = requests.head(url)
-    if resp.status_code != 200:
-        return Response("'{}' not available. Status code was {}\n".format(url, resp.status_code),
+    url = request.args.get("url")
+    if not url:
+        return Response("url is empty, try '{}?url=http://url/'".format(request.url_root + request.path.lstrip("/")),
                         400,
                         mimetype="text/plain")
+
+    try:
+        resp = requests.head(url)
+        if resp.status_code != 200:
+            return Response("'{}' not available. Status code was {}\n".format(url, resp.status_code),
+                            400,
+                            mimetype="text/plain")
+    except Exception as ex:
+        return Response("Error occured while checking url: {}".format(ex), 400, mimetype="text/plain")
 
     mirrors = db_session.query(Property) \
         .filter(Property.identifier.like("MIRROR_%")) \
