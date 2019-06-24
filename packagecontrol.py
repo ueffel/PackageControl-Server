@@ -1,5 +1,6 @@
 import inspect
 import asyncio
+import dateutil.parser
 import json
 import requests
 import traceback
@@ -277,13 +278,13 @@ def check_auth():
 
 def do_synchronize_generate(mirrors):
     yield "Starting synchronize...\n"
-    packages_added_all = 0
 
     for mirror in mirrors:
         yield "Synchronizing '{}'\n".format(mirror.text_val)
         try:
             resp = requests.get(mirror.text_val)
             if resp.status_code != 200:
+                yield "Errornous http status code: {}. Skipping this mirror.\n".format(resp.status_code)
                 continue
 
             packages_mirror = json.loads(resp.content)
@@ -307,11 +308,19 @@ def do_synchronize_generate(mirrors):
                                    package_mirror["repo"],
                                    package_mirror["ptype"],
                                    package_mirror["path"],
-                                   package_mirror["added"],
+                                   dateutil.parser.parse(package_mirror["added"]),
                                    commit=False)
                     yield "adding {}\n".format(package_mirror)
                     packages_added += 1
-            packages_added_all += packages_added
+
+            if packages_added > 0:
+                try:
+                    db_session.commit()
+                except Exception as ex:
+                    db_session.rollback()
+                    LOGGER.error(ex)
+                    LOGGER.debug("{}: {}\n".format(ex, traceback.format_exc()))
+                    yield "{}\n".format(ex)
             yield "Mirror '{}': {} packages added.\n".format(mirror.text_val, packages_added)
         except Exception as ex:
             LOGGER.error(ex)
@@ -319,10 +328,7 @@ def do_synchronize_generate(mirrors):
             LOGGER.debug(error)
             yield error
 
-    if packages_added_all > 0:
-        db_session.commit()
-
-    yield "Synchronization successful.\n"
+    yield "Synchronization done.\n"
 
 
 @app.route("/sync/mirrors/")
