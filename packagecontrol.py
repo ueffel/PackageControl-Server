@@ -67,7 +67,9 @@ def index():
 
 @app.route("/packages.json")
 def packages_json():
-    return Response(stream_with_context(packages_json_generate()), 200, mimetype="application/json")
+    return Response(stream_with_context(packages_json_generate()),
+                    mimetype="application/json",
+                    headers={"X-Accel-Buffering": "no"})
 
 
 def packages_json_generate():
@@ -256,7 +258,9 @@ def do_synchronize():
     if not mirrors:
         return Response("No mirrors set up.\n", 500, mimetype="text/plain")
 
-    return Response(stream_with_context(do_synchronize_generate(mirrors)), mimetype="text/plain")
+    return Response(stream_with_context(do_synchronize_generate(mirrors)),
+                    mimetype="text/plain",
+                    headers={"X-Accel-Buffering": "no"})
 
 
 def check_auth():
