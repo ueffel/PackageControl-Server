@@ -6,7 +6,7 @@ import requests
 import traceback
 import model.PackageSource
 from flask import Flask, redirect, jsonify, render_template, url_for, request, Response, stream_with_context
-from sqlalchemy import or_, and_, not_
+from sqlalchemy import or_, and_, not_, func
 from sqlalchemy.orm import defer, load_only
 from datetime import datetime, timedelta
 from model.DB import db_session, init_db
@@ -67,9 +67,16 @@ def index():
 
 @app.route("/packages.json")
 def packages_json():
+    update_needed = db_session.query(func.count(Package.pid)) \
+        .filter(or_(Package.last_updated.is_(None),
+                    and_(Package.last_update_successful,
+                         Package.last_updated < datetime.utcnow() - timedelta(hours=24)),
+                    and_(not_(Package.last_update_successful),
+                         Package.last_updated < datetime.utcnow() - timedelta(hours=4)))).scalar() > 0
+
     return Response(stream_with_context(packages_json_generate()),
                     mimetype="application/json",
-                    headers={"X-Accel-Buffering": "no"})
+                    headers={"X-Accel-Buffering": "no" if update_needed else "yes"})
 
 
 def packages_json_generate():
