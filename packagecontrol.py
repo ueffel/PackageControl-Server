@@ -84,8 +84,8 @@ def packages_json_generate():
 
     cached_packages = db_session.query(Package) \
         .filter(Package.last_updated.isnot(None),
-                or_(and_(Package.last_update_successful,
-                         Package.last_updated >= datetime.utcnow() - timedelta(hours=24)))) \
+                Package.last_update_successful,
+                Package.last_updated >= datetime.utcnow() - timedelta(hours=24)) \
         .options(load_only(Package.owner,
                            Package.name,
                            Package.description,
