@@ -14,15 +14,28 @@ table
     margin: auto;
     border-collapse: collapse;
 }
+tr:nth-of-type(even)
+{
+    background-color: #ee82ee23;
+}
+th
+{
+    background-color: #8000807c;
+}
 th, td
 {
-    border: 3px inset purple;
-    padding: 2px 5px;
+    border: 1px inset #8000807c;
+    padding: .3em;
     min-width: 64px;
 }
 th:last-child, td:last-child
 {
     border: none;
+    background-color: white;
+}
+td[data-int]
+{
+    text-align: center;
 }
 img
 {
