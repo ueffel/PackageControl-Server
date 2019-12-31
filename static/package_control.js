@@ -41,15 +41,34 @@ function sortTable(header, sortDirection)
         left_value = left.getElementsByTagName('td')[sortColumn].getAttribute('data-time');
         if (!left_value)
         {
-            left_value = left.getElementsByTagName('td')[sortColumn].textContent;
+            left_value = parseInt(left.getElementsByTagName('td')[sortColumn].getAttribute('data-int'));
+            if (isNaN(left_value))
+            {
+                left_value = left.getElementsByTagName('td')[sortColumn].textContent;
+            }
         }
         right_value = right.getElementsByTagName('td')[sortColumn].getAttribute('data-time')
         if (!right_value)
         {
-            right_value = right.getElementsByTagName('td')[sortColumn].textContent;
+            right_value = parseInt(right.getElementsByTagName('td')[sortColumn].getAttribute('data-int'));
+            if (isNaN(right_value)) {
+                right_value = right.getElementsByTagName('td')[sortColumn].textContent;
+            }
         }
-        let cmp = left_value.localeCompare(right_value);
-        console.log(left_value);
+        let cmp;
+        if (left_value < right_value)
+        {
+            cmp = -1;
+        }
+        else if (right_value < left_value)
+        {
+            cmp = 1;
+        }
+        else
+        {
+            cmp = 0;
+        }
+
         if (sortDirection == 'desc')
         {
             return cmp;

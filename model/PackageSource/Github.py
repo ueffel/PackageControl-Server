@@ -27,6 +27,7 @@ class Github(PackageSourceBase):
                 if GITHUB_BASIC_AUTH_USER and GITHUB_BASIC_AUTH_TOKEN else None
             repo_info = json.loads(self.do_get_request(api_url, auth=auth))
             self.package.description = repo_info["description"]
+            self.package.stars = repo_info["stargazers_count"]
 
             request_url = "{}/releases".format(api_url)
             releases = json.loads(self.do_get_request(request_url, auth=auth))

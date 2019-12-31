@@ -332,6 +332,8 @@ def do_synchronize_generate(mirrors):
                     LOGGER.error(ex)
                     LOGGER.debug("{}: {}\n".format(ex, traceback.format_exc()))
                     yield "{}\n".format(ex)
+            else:
+                db_session.rollback()
             yield "Mirror '{}': {} packages added.\n".format(mirror.text_val, packages_added)
         except Exception as ex:
             LOGGER.error(ex)

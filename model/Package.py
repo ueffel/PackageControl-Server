@@ -21,6 +21,7 @@ class Package(Base):
     version = Column(String(50), nullable=True)
     download_url = Column(String(1000), nullable=True)
     homepage = Column(String(1000), nullable=True)
+    stars = Column(Integer, nullable=True)
     __table_args__ = (UniqueConstraint("owner", "repo", "ptype", "path"),)
 
     def __init__(self, owner=None, repo=None, ptype=None, path=None, added=None, last_updated=None,

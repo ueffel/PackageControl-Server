@@ -22,6 +22,12 @@
                     <th onclick="sortTable(this)">Type</th>
                     <th onclick="sortTable(this)">Version</th>
                     <th onclick="sortTable(this)">Version Date</th>
+                    <th onclick="sortTable(this)" title="Github Stars">
+                        <img height="16" width="16" src="{{ url_for('static', filename='github.ico') }}" />
+                        <svg aria-label="star" height="16" width="14" role="img">
+                            <path fill-rule="evenodd" d="M14 6l-4.9-.64L7 1 4.9 5.36 0 6l3.6 3.26L2.67 14 7 11.67 11.33 14l-.93-4.74L14 6z" />
+                        </svg>
+                    </th>
                     <th onclick="sortTable(this)">Last updated</th>
                     <th onclick="sortTable(this)">Added</th>
                     <th onclick="sortTable(this)"></th>
@@ -33,6 +39,7 @@
                     <td{{ {'title': ptype_descriptions[package.ptype]}|xmlattr }}>{{ package.ptype }}</td>
                     <td>{{ package.version }}</td>
                     <td title="{{ package.date.isoformat() + ' UTC' if package.date else '' }}" data-time="{{ package.date if package.date else '' }}">{{ package.date.isoformat() if package.date else '' }}</td>
+                    <td data-int="{{ package.stars }}">{{ package.stars if package.stars and package.stars > 0 else '' }}</td>
                     <td title="{{ package.last_updated.isoformat() + ' UTC' if package.last_update_successful else '' }}" data-time="{{ package.last_updated if package.last_update_successful else '' }}">{{ package.last_updated.isoformat() if package.last_update_successful else '' }}</td>
                     <td title="{{ package.added.isoformat() }}{{ ' UTC' if package.added else '' }}" data-time="{{ package.added }}">{{ package.added.isoformat() }}</td>
                     <td>
