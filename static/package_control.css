@@ -16,15 +16,15 @@ table
 }
 tr:nth-of-type(even)
 {
-    background-color: #ee82ee23;
+    background-color: rgba(238, 130, 238, 0.137);
 }
 th
 {
-    background-color: #8000807c;
+    background-color: rgba(128, 0, 128, 0.486);
 }
 th, td
 {
-    border: 1px inset #8000807c;
+    border: 1px inset rgba(128, 0, 128, 0.486);
     padding: .3em;
     min-width: 64px;
 }
