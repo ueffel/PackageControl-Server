@@ -1,6 +1,6 @@
 body
 {
-    width: 1200px;
+    width: 1280px;
     margin: auto;
     font-family: sans-serif;
 }
@@ -10,7 +10,7 @@ h1, p
 }
 table
 {
-    width: 1200px;
+    width: 1280px;
     margin: auto;
     border-collapse: collapse;
 }
@@ -26,7 +26,7 @@ th, td
 {
     border: 1px inset rgba(128, 0, 128, 0.486);
     padding: .3em;
-    min-width: 64px;
+    min-width: 56px;
 }
 th:last-child, td:last-child
 {
