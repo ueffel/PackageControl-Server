@@ -2,7 +2,7 @@ body
 {
     width: 1280px;
     margin: auto;
-    font-family: sans-serif;
+    font-family: 'Source Sans Pro', 'Calibri', sans-serif;
 }
 h1, p
 {
@@ -17,6 +17,10 @@ table
 tr:nth-of-type(even)
 {
     background-color: rgba(238, 130, 238, 0.137);
+}
+tr:hover
+{
+    background-color: rgba(238, 130, 238, 0.635);
 }
 th
 {
