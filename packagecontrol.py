@@ -306,6 +306,8 @@ def do_synchronize_generate(mirrors):
             packages_added = 0
             for package_mirror in packages_mirror:
                 found = False
+                if "path" not in package_mirror:
+                    package_mirror["path"] = None
                 for package in packages:
                     if package_mirror["owner"] == package.owner \
                             and package_mirror["ptype"] == package.ptype \
