@@ -23,14 +23,14 @@
                     <th onclick="sortTable(this)">Version</th>
                     <th onclick="sortTable(this)">Version Date</th>
                     <th onclick="sortTable(this)" title="Github Stars">
-                        <img height="16" width="16" src="{{ url_for('static', filename='github.ico') }}" />
+                        <img height="16" width="16" src="{{ url_for('static', filename='github.ico') }}" alt="GitHub Logo" />
                         <svg aria-label="star" height="16" width="14" role="img">
                             <path fill-rule="evenodd" d="M14 6l-4.9-.64L7 1 4.9 5.36 0 6l3.6 3.26L2.67 14 7 11.67 11.33 14l-.93-4.74L14 6z" />
                         </svg>
                     </th>
                     <th onclick="sortTable(this)">Last updated</th>
                     <th onclick="sortTable(this)">Added</th>
-                    <th onclick="sortTable(this)"></th>
+                    <th></th>
                 </tr>
                 {% for package in packages %}
                 <tr>
