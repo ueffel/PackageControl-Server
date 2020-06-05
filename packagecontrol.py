@@ -54,12 +54,17 @@ init_db()
 @app.route("/")
 def index():
     packages = db_session.query(Package).options(defer(Package.repo),
-                                                 defer(Package.description),
                                                  defer(Package.filename),
-                                                 defer(Package.path),
-                                                 defer(Package.download_url)).all()
+                                                 defer(Package.path)).all()
+    for package in packages:
+        if package.name.startswith("Keypirinha-"):
+            package.name = package.name[len("Keypirinha-"):]
+        if package.name.startswith("keypirinha-"):
+            package.name = package.name[len("keypirinha-"):]
+        if package.name.startswith("Plugin-"):
+            package.name = package.name[len("Plugin-"):]
     return render_template("index.html",
-                           title="{} ({} packages)".format(REPO_NAME, len(packages)),
+                           title=REPO_NAME,
                            packages=packages,
                            repo_url=url_for("packages_json", _external=True),
                            ptype_descriptions=package_sources_descriptions)
@@ -174,7 +179,7 @@ def new_package():
         return redirect(url_for("index"))
 
     return render_template("new_package.html",
-                           title="Submit a new package to {}".format(REPO_NAME),
+                           title=REPO_NAME,
                            form=form,
                            required_if_fields=required_if_fields)
 
