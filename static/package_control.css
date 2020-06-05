@@ -1,104 +1,211 @@
-body
-{
-    width: 1280px;
-    margin: auto;
+:root {
+    --border: 1px solid #bc5abc;
+    --control-background: #fdeefd;
+    --control-color: #333;
+    --control-hover: #f4b0f4;
+    --control-active: white;
+    --card-border: 1px solid #f3d0f3;
+}
+
+body {
+    padding: 1rem;
     font-family: 'Source Sans Pro', 'Calibri', sans-serif;
+    background: #fafaf7;
+    color: #333;
 }
-h1, p
-{
-    text-align: center;
+
+header {
+    /* background: left no-repeat url("package_control.ico"); */
+    /* background-size: contain; */
+    border-bottom: var(--border);
+    margin-bottom: 2rem;
+    text-shadow: 0 0 2px white;
+    display: flex;
+    flex-flow: row;
 }
-table
-{
-    width: 1280px;
-    margin: auto;
-    border-collapse: collapse;
+
+header>a {
+    justify-self: center;
+    width: 5rem;
+    margin-top: auto;
 }
-tr:nth-of-type(even)
-{
-    background-color: rgba(238, 130, 238, 0.137);
+
+header img {
+    width: 100%;
+    height: auto;
 }
-tr:hover
-{
-    background-color: rgba(238, 130, 238, 0.635);
+
+header div {
+    margin-left: 1rem;
+    padding-bottom: 1rem;
 }
-th
-{
-    background-color: rgba(128, 0, 128, 0.486);
+
+header p, .package>h2 {
+    margin: 0;
 }
-th, td
-{
-    border: 1px inset rgba(128, 0, 128, 0.486);
-    padding: .3em;
-    min-width: 56px;
+
+h1 {
+    margin-bottom: 0;
 }
-th:last-child, td:last-child
-{
-    border: none;
-    background-color: white;
+
+.repository-info .action {
+    margin-left: 2rem;
 }
-td[data-int]
-{
-    text-align: center;
+
+.action {
+    border: var(--border);
+    border-radius: 0.25rem;
+    background: var(--control-background);
+    color: var(--control-color);
+    font-size: 0.9rem;
+    margin: 0.25rem 0;
+    padding: 0.25rem 0.5rem;
+    text-decoration: none;
+    transition: 0.25s background;
 }
-img
-{
-    text-align: center;
+
+#package-list {
+    list-style-type: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(25rem, 1fr));
+    grid-gap: 1.5rem;
 }
-form
-{
+
+.package {
+    background: white;
+    border-radius: 0.25rem;
+    border: var(--card-border);
     position: relative;
-    width: 50%;
-    margin: auto;
+    padding: 1rem;
+    display: flex;
+    flex-flow: column;
 }
-form div
-{
-    margin: 5px;
+
+.package--description {
+    margin: 0.25rem 0 0.5rem;
 }
-form label
-{
-    width: 25%;
+
+.detail {
+    color: #777;
+    margin: 0.5rem 0;
+}
+
+.detail span, .detail time {
+    font-weight: 400;
+    color: #111;
+}
+
+.stars {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+
+.stars svg {
+    height: 0.9rem;
+    width: 1rem;
+}
+
+.bottom-line {
+    display: flex;
+    flex-flow: row;
+    margin-top: auto;
+}
+
+.action:focus, .action:hover {
+    background: var(--control-hover);
+}
+
+.action:active {
+    background: var(--control-active);
+}
+
+.action-bar {
+    margin-top: 1rem;
+    margin-left: auto;
+}
+
+details {
+    margin-top: 1rem;
+}
+
+summary {
+    cursor: pointer;
+}
+
+.details-box {
+    background: white;
+    border-radius: 0.25rem;
+    border: 1px solid #ddd;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    position: absolute;
+    width: 15rem;
+    z-index: 100;
+}
+
+footer {
+    margin-top: 2rem;
+    border-top: var(--border);
+}
+
+.json-url {
+    line-height: 1.3;
+    display: flex;
+}
+
+.json-url input {
+    flex: auto;
+    font-family: monospace;
+    font-size: 1.1rem;
+    margin-left: 1rem;
+    max-width: 35rem;
+}
+
+#submit_form div {
+    margin: .5rem;
+}
+
+#submit_form label {
+    width: 8rem;
     text-align: right;
     display: inline-block;
-    margin-right: 5px;
+    margin-right: 1rem;
 }
-form input
-{
-    width: 60%;
-}
-.errors
-{
+
+.errors {
     color: red;
 }
-span.question_mark
-{
+
+span.question_mark {
     display: inline-block;
     border: 1px solid black;
-    width: 1.2em;
+    width: 1.2rem;
     text-align: center;
-    border-radius: 1em;
+    border-radius: 1rem;
     background-color: #EEFFEE;
 }
-.tooltip
-{
+
+.tooltip {
     display: none;
 }
-.tooltip_bold
-{
+
+.tooltip_bold {
     font-weight: bold;
 }
-span.question_mark:hover ~ .tooltip
-{
+
+span.question_mark:hover~.tooltip {
     display: block;
     position: fixed;
     z-index: 1;
     background-color: #EEFFEE;
     width: 30%;
     height: auto;
-    overflow:hidden;
-    padding: 0px 15px;
+    overflow: hidden;
+    padding: 0rem 1rem;
 }
-span.question_mark:hover ~ .tooltip p
-{
+
+span.question_mark:hover~.tooltip p {
     text-align: left;
 }

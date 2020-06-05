@@ -6,55 +6,58 @@ if (!String.prototype.endsWith)
     };
 }
 
-function sortTable(header, sortDirection)
+function sortPackages(button)
 {
-    if (!header)
+    if (!button || !button.hasAttribute("data-sort-field"))
     {
         return;
     }
+    sortBy = button.getAttribute("data-sort-field");
 
-    let table = header.parentElement.parentElement.parentElement;
-    let rows =  [].slice.call(table.getElementsByTagName('tr')).slice(1);
-    if (sortDirection == undefined)
+    let packages = [].slice.call(document.getElementsByClassName("package"));
+    if (!button.hasAttribute("data-sort-dir") || button.getAttribute("data-sort-dir") == "asc")
     {
-        sortDirection = 'asc';
-        if (header.innerHTML.endsWith(' ▲'))
-        {
-            sortDirection = 'desc';
-        }
+        sortDirection = "asc";
     }
-    let sortColumn = -1
-    for (let i = 0; i < header.parentElement.children.length; i++)
+    else
     {
-        if (header == header.parentElement.children[i])
-        {
-            sortColumn = i
-            break;
-        }
+        sortDirection = "desc";
     }
-    if (sortColumn == -1)
+    packages.sort(function (left, right)
     {
-        return;
-    }
-    rows.sort(function(left, right)
-    {
-        left_value = left.getElementsByTagName('td')[sortColumn].getAttribute('data-time');
-        if (!left_value)
+        let left_value;
+        let right_value;
+
+        switch(sortBy)
         {
-            left_value = parseInt(left.getElementsByTagName('td')[sortColumn].getAttribute('data-int'));
-            if (isNaN(left_value))
-            {
-                left_value = left.getElementsByTagName('td')[sortColumn].textContent;
-            }
+            case "name":
+                left_value = left.getElementsByClassName("package--name")[0].innerHTML.toLowerCase();
+                right_value = right.getElementsByClassName("package--name")[0].innerHTML.toLowerCase();
+                break;
+            case "updated":
+                left_elements = left.getElementsByClassName("package--last-updated");
+                right_elements = right.getElementsByClassName("package--last-updated");
+                left_value = left_elements.length > 0 ? new Date(left_elements[0].getAttribute("datetime")) : new Date(0);
+                right_value = right_elements.length > 0 ? new Date(right_elements[0].getAttribute("datetime")) : new Date(0);
+                break;
+            case "stars":
+                left_stars = left.getElementsByClassName("package--stars");
+                right_stars = right.getElementsByClassName("package--stars");
+                left_value = left_stars.length > 0 ? parseInt(left_stars[0].innerHTML) : 0;
+                right_value = right_stars.length > 0 ? parseInt(right_stars[0].innerHTML) : 0;
+                break;
+            case "author":
+                left_value = left.getElementsByClassName("package--author")[0].innerHTML.toLowerCase();
+                right_value = right.getElementsByClassName("package--author")[0].innerHTML.toLowerCase();
+                break;
+            case "added":
+                left_value = new Date(left.getElementsByClassName("package--added")[0].getAttribute("datetime"));
+                right_value = new Date(right.getElementsByClassName("package--added")[0].getAttribute("datetime"));
+                break;
+            default:
+                break;
         }
-        right_value = right.getElementsByTagName('td')[sortColumn].getAttribute('data-time')
-        if (!right_value)
-        {
-            right_value = parseInt(right.getElementsByTagName('td')[sortColumn].getAttribute('data-int'));
-            if (isNaN(right_value)) {
-                right_value = right.getElementsByTagName('td')[sortColumn].textContent;
-            }
-        }
+
         let cmp;
         if (left_value < right_value)
         {
@@ -69,7 +72,9 @@ function sortTable(header, sortDirection)
             cmp = 0;
         }
 
-        if (sortDirection == 'desc')
+        // console.log(left_value + " " + right_value + " -> " + cmp);
+
+        if (sortDirection == "desc")
         {
             return cmp;
         }
@@ -78,19 +83,14 @@ function sortTable(header, sortDirection)
             return cmp * -1;
         }
     });
-    let rowsBefore = table.getElementsByTagName('tr');
-    for (let i = 1; i < rowsBefore.length; i++)
-    {
-        let parent = rowsBefore[i].parentNode;
-        parent.insertBefore(rows[i-1], parent.firstChild.nextSibling);
-    }
 
-    let headers = table.getElementsByTagName('th');
-    for(let i = 0; i < headers.length; i++)
+    let packagesBefore = document.getElementsByClassName("package");
+    for (let i = 1; i < packagesBefore.length; i++)
     {
-        headers[i].innerHTML = headers[i].innerHTML.replace(' ▲', '').replace(' ▼', '');
+        let parent = packagesBefore[i].parentNode;
+        parent.insertBefore(packages[i], parent.firstChild.nextSibling);
     }
-    header.innerHTML += sortDirection == 'asc' ? ' ▲' : ' ▼';
+    button.setAttribute("data-sort-dir", sortDirection == "asc" ? "desc" : "asc");
 }
 
 function makeRelativeTime(date)
@@ -98,32 +98,29 @@ function makeRelativeTime(date)
     let now = Date.now();
     let diff = now - date;
 
-    if (diff >= 3600 * 24 * 1000)
+    if (diff > 7 * 3600 * 24 * 1000)
     {
-        return date.toLocaleString();
+        return date.toLocaleDateString();
     }
     else
     {
-        let hours = new Date(diff).getUTCHours();
-        let minutes = new Date(diff).getUTCMinutes();
-        let seconds = new Date(diff).getSeconds();
+        let days = Math.floor(diff / (24 * 60 * 60 * 1000));
+        let hours = Math.floor(diff / (60 * 60 * 1000));
+        let minutes = Math.floor(diff / (60 * 1000));
+        let seconds = Math.floor(diff / 1000);
         let date_str;
 
-        if (hours > 0)
+        if (days > 0)
+        {
+            date_str = days + " days";
+        }
+        else if (hours > 0)
         {
             date_str = hours + " hours";
-            if (minutes > 0)
-            {
-                date_str += " " + minutes + " minutes";
-            }
         }
         else if (minutes > 0)
         {
             date_str = minutes + " minutes"
-            if (seconds > 0)
-            {
-                date_str +=  " " + seconds + " seconds";
-            }
         }
         else
         {

@@ -8,15 +8,21 @@
         <script src="{{ url_for('static', filename='package_control.js') }}" defer></script>
     </head>
     <body>
-        <p>
+        <header>
             <a href="{{ url_for('index') }}">
-                <img src="{{ url_for('static', filename='package_control.ico') }}" alt="PackageControl WebApp" title="PackageControl WebApp"/>
+                <img src="{{ url_for('static', filename='package_control.ico') }}" alt="PackageControl WebApp"
+                    title="PackageControl WebApp" />
             </a>
-        </p>
-        <h1>{{ title }}</h1>
-        <div id="content">
+            <div>
+                <h1>{{ title }}</h1>
+                <p>A collection of packages for <a href="https://keypirinha.com/">keypirinha</a>, a fast launcher for keyboard
+                    ninjas on Windows.</p>
+            </div>
+        </header>
+        <main>
+            <h2>Submit a new package</h2>
             {% from "_formhelper.html" import render_field %}
-            <form name="submit_package" method="post">
+            <form id="submit_form" name="submit_package" method="post">
                 {{ form.csrf_token }}
                 {{ render_field(form.type) }}
                 {{ render_field(form.owner) }}
@@ -32,7 +38,7 @@
                 {% endif %}
                 <p><input type="submit" value="Submit" /></p>
             </form>
-        </div>
+        </main>
         <script>
             if (document.submit_package !== undefined)
             {{ '{' }}

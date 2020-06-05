@@ -8,74 +8,103 @@
         <script src="{{ url_for('static', filename='package_control.js') }}" defer></script>
     </head>
     <body>
-        <p>
+        <header>
             <a href="{{ url_for('index') }}">
                 <img src="{{ url_for('static', filename='package_control.ico') }}" alt="PackageControl WebApp" title="PackageControl WebApp"/>
             </a>
-        </p>
-        <h1>{{ title }}</h1>
-        <div id="content">
-            <table>
-                <tr>
-                    <th onclick="sortTable(this)">Owner</th>
-                    <th onclick="sortTable(this)">Name</th>
-                    <th onclick="sortTable(this)">Type</th>
-                    <th onclick="sortTable(this)">Version</th>
-                    <th onclick="sortTable(this)">Version Date</th>
-                    <th onclick="sortTable(this)" title="Github Stars">
-                        <img height="16" width="16" src="{{ url_for('static', filename='github.ico') }}" alt="GitHub Logo" />
-                        <svg aria-label="star" height="16" width="14" role="img">
-                            <path fill-rule="evenodd" d="M14 6l-4.9-.64L7 1 4.9 5.36 0 6l3.6 3.26L2.67 14 7 11.67 11.33 14l-.93-4.74L14 6z" />
-                        </svg>
-                    </th>
-                    <th onclick="sortTable(this)">Last updated</th>
-                    <th onclick="sortTable(this)">Added</th>
-                    <th></th>
-                </tr>
-                {% for package in packages %}
-                <tr>
-                    <td>{{ package.owner }}</td>
-                    <td><a href="{{ package.homepage }}">{{ package.name }}</a></td>
-                    <td{{ {'title': ptype_descriptions[package.ptype]}|xmlattr }}>{{ package.ptype }}</td>
-                    <td>{{ package.version }}</td>
-                    <td title="{{ package.date.isoformat() + ' UTC' if package.date else '' }}" data-time="{{ package.date if package.date else '' }}">{{ package.date.isoformat() if package.date else '' }}</td>
-                    <td data-int="{{ package.stars }}">{{ package.stars if package.stars and package.stars > 0 else '' }}</td>
-                    <td title="{{ package.last_updated.isoformat() + ' UTC' if package.last_update_successful else '' }}" data-time="{{ package.last_updated if package.last_update_successful else '' }}">{{ package.last_updated.isoformat() if package.last_update_successful else '' }}</td>
-                    <td title="{{ package.added.isoformat() }}{{ ' UTC' if package.added else '' }}" data-time="{{ package.added }}">{{ package.added.isoformat() }}</td>
-                    <td>
-                        {% if package.updatable == 1 %}
-                        <a href="{{ url_for('update_package_by_id', package_id=package.pid) }}" title="update this package">&#x21bb;</a>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-        <p>
-            <span>Repository URL:</span>
-            <input type="text" size="80" value="{{ repo_url }}" onfocus="this.select()" />
-        </p>
-        <p>Wanna submit your own package? Do it <a href="{{ url_for('new_package') }}">here</a></p>
+            <div>
+                <h1>{{ title }}</h1>
+                <p>A collection of packages for <a href="https://keypirinha.com/">keypirinha</a>, a fast launcher for keyboard
+                    ninjas on Windows.</p>
+            </div>
+        </header>
+        <main>
+            <p class="repository-info">
+                Currently containing <span class="repo--counter">{{ packages|length }}</span> packages.
+                <a class="action" href="{{ url_for('new_package') }}">Submit a package</a>
+            </p>
+            <div class="sort-controls">
+                <span>Sort by:</span>
+                <button onclick="sortPackages(this)" data-sort-field="name">Name</button>
+                <button onclick="sortPackages(this)" data-sort-field="updated" data-sort-dir="desc">Recently updated</button>
+                <button onclick="sortPackages(this)" data-sort-field="stars" data-sort-dir="desc">Stars</button>
+                <button onclick="sortPackages(this)" data-sort-field="author">Author</button>
+                <button onclick="sortPackages(this)" data-sort-field="added" data-sort-dir="desc">Added</button>
+            </div>
+            <svg aria-label="star" height="16" width="14" role="img" style="display: none;">
+                <path id="svg_star" fill-rule="evenodd" d="M14 6l-4.9-.64L7 1 4.9 5.36 0 6l3.6 3.26L2.67 14 7 11.67 11.33 14l-.93-4.74L14 6z" />
+            </svg>
+            <ul id="package-list">
+            {% for package in packages %}
+                <li class="package">
+                    <h2 class="package--name">{{ package.name }}</h2>
+                    <div class="package--description">{{ package.description }}</div>
+                    <div class="detail">Created by <span class="package--author">{{ package.owner }}</span></div>
+                    <div class="detail">
+                    {% if package.last_updated and package.last_update_successful %}
+                        Current version: <span class="package--version">{{ package.version }}</span>,
+                        released on <time class="package--last-updated" datetime="{{ package.date.isoformat() }}">{{ package.date.isoformat() }}</time>
+                    {% else %}
+                        Current version: <span class="package--version">&lt;unknown&gt;</span>,
+                        released:
+                    {% endif %}
+                    </div>
+                    <div class="bottom-line">
+                        <details>
+                            <summary>More</summary>
+                            <div class="details-box">
+                                <p class="detail">Repository type: <span class="package--type" title="{{ ptype_descriptions[package.ptype] }}">{{ package.ptype }}</span></p>
+                                <p class="detail">Added:
+                                    <time class="package--added" datetime="{{ package.added.isoformat() }}">{{ package.added.isoformat() }}</time>
+                                </p>
+                                <p class="detail">Last retrieved:
+                                    <time class="package--refresh" datetime="{{ package.last_updated.isoformat() if package.last_updated else '' }}">{{ package.last_updated.isoformat() if package.last_updated else '' }}</time>
+                                </p>
+                                {% if package.updatable == 1 %}
+                                <form method="get" action="{{ url_for('update_package_by_id', package_id=package.pid) }}">
+                                    <button class="action" type="submit">Refresh information</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </details>
+                        <div class="action-bar">
+                            <a class="action" href="{{ package.homepage }}">Visit homepage</a>
+                            {% if package.last_updated and package.last_update_successful %}
+                            <a class="action" href="{{ package.download_url }}">Download package</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if package.stars and package.stars > 0 %}
+                    <div class="stars" title="Github stars">
+                        <svg aria-label="star" role="img"><use xlink:href="#svg_star" /></svg><span class="package--stars">{{ package.stars }}</span>
+                    </div>
+                    {% endif %}
+                </li>
+            {% endfor %}
+            </ul>
+        </main>
+        <footer>
+            <p class="json-url">
+                <span>Repository URL:</span>
+                <input readonly type="text" value="{{ repo_url }}" onfocus="this.select()" />
+            </p>
+        </footer>
         <script>
-            window.onload = function()
+            window.onload = function ()
             {
-                let table = document.getElementsByTagName('table')[0];
-                let rows =  [].slice.call(table.getElementsByTagName('tr')).slice(1);
-                for(let i = 0; i < rows.length; i++)
+                let times = document.getElementsByTagName('time');
+                for (let i = 0; i < times.length; i++)
                 {
-                    let columns = rows[i].getElementsByTagName('td');
-                    for(let j = 0; j < columns.length; j++)
+                    if (!times[i].hasAttribute('datetime'))
                     {
-                        if (!columns[j].hasAttribute('data-time'))
-                        {
-                            continue;
-                        }
-                        let tempdate = new Date(columns[j].getAttribute('data-time'));
-                        tempdate.setTime(tempdate.getTime() - new Date().getTimezoneOffset() * 60000)
-                        if (tempdate && tempdate.getTime())
-                        {
-                            columns[j].innerHTML = makeRelativeTime(tempdate);
-                        }
+                        continue;
+                    }
+                    let tempdate = new Date(times[i].getAttribute('datetime'));
+                    tempdate.setTime(tempdate.getTime() - new Date().getTimezoneOffset() * 60000)
+                    if (tempdate && tempdate.getTime())
+                    {
+                        times[i].innerHTML = makeRelativeTime(tempdate);
+                        times[i].title = tempdate.toLocaleString();
                     }
                 }
             };
