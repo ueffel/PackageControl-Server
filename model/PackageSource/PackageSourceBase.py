@@ -27,3 +27,11 @@ class PackageSourceBase(object):
             return req.text
         else:
             raise requests.HTTPError("Request to '{}' failed: {} {}".format(url, req.status_code, req.text))
+
+    @staticmethod
+    def do_post_request(url, data=None, json=None, auth=None):
+        req = requests.post(url, data=data, json=json, proxies=urllib.request.getproxies(), auth=auth)
+        if req.status_code == 200:
+            return req.text
+        else:
+            raise requests.HTTPError("Request to '{}' failed: {} {}".format(url, req.status_code, req.text))

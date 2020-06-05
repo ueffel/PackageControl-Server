@@ -24,21 +24,46 @@ class GithubFile(PackageSourceBase):
 
     def update(self):
         try:
-            api_url = "https://api.github.com/repos/{}/{}".format(self.package.owner, self.package.repo)
-            request_url = "{}/commits".format(api_url)
+            api_url = "https://api.github.com/graphql"
+            query_str = """{
+  repository(owner: "%s", name: "%s") {
+    object(expression: "master") {
+      ... on Commit {
+        history(first: 1, path: "%s") {
+          nodes {
+            committedDate
+            oid
+          }
+        }
+      }
+    }
+  }
+}""" % (self.package.owner, self.package.repo, self.package.path.lstrip("/"))
+
+            query = {
+                "query": query_str,
+                "variables": None,
+            }
+
             auth = HTTPBasicAuth(GITHUB_BASIC_AUTH_USER, GITHUB_BASIC_AUTH_TOKEN) \
                 if GITHUB_BASIC_AUTH_USER and GITHUB_BASIC_AUTH_TOKEN else None
-            commit_json = json.loads(self.do_get_request(request_url, {"path": self.package.path}, auth=auth))
-            latest_commit = max(commit_json,
-                                key=lambda commit: dateutil.parser.parse(commit["commit"]["committer"]["date"],
-                                                                         ignoretz=True))
-            self.package.date = dateutil.parser.parse(latest_commit["commit"]["committer"]["date"], ignoretz=True)
 
-            request_url2 = "{}/contents/{}".format(api_url, self.package.path)
-            file_json = json.loads(self.do_get_request(request_url2, {"ref": latest_commit["sha"]}, auth=auth))
-            self.package.download_url = file_json["download_url"]
-            self.package.filename = file_json["name"]
-            self.package.version = "1.0.0+" + latest_commit["sha"][:7]
+            repo_info = json.loads(self.do_post_request(api_url, json=query, auth=auth))
+
+            if len(repo_info["data"]["repository"]["object"]["history"]["nodes"]) == 0:
+                raise ValueError("no commits found")
+
+            commit = repo_info["data"]["repository"]["object"]["history"]["nodes"][0]
+
+            self.package.description = "no description"
+            self.package.date = dateutil.parser.parse(commit["committedDate"], ignoretz=True)
+            self.package.download_url = "https://github.com/{}/{}/raw/{}/{}".format(
+                self.package.owner,
+                self.package.repo,
+                commit["oid"],
+                self.package.path.lstrip("/"))
+            self.package.filename = os.path.basename(self.package.path)
+            self.package.version = "1.0.0+" + commit["oid"][:7]
             return True
         except Exception as ex:
             LOGGER.error(ex)

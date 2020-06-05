@@ -5,6 +5,7 @@ import requests
 import json
 import dateutil.parser
 import traceback
+import urllib
 
 
 class Github(PackageSourceBase):
@@ -22,28 +23,55 @@ class Github(PackageSourceBase):
 
     def update(self):
         try:
-            api_url = "https://api.github.com/repos/{}/{}".format(self.package.owner, self.package.repo)
+            api_url = "https://api.github.com/graphql"
+            query_str = """{
+  repository(owner: "%s", name: "%s") {
+    releases(first: 10, orderBy: {field: CREATED_AT, direction: DESC}) {
+      nodes {
+        releaseAssets(first: 10) {
+          nodes {
+            name
+            downloadUrl
+          }
+        }
+        tagName
+        isPrerelease
+        isDraft
+        publishedAt
+      }
+    }
+    description
+    stargazers {
+      totalCount
+    }
+  }
+}""" % (self.package.owner, self.package.repo)
+
+            query = {
+                "query": query_str,
+                "variables": None,
+            }
+
             auth = HTTPBasicAuth(GITHUB_BASIC_AUTH_USER, GITHUB_BASIC_AUTH_TOKEN) \
                 if GITHUB_BASIC_AUTH_USER and GITHUB_BASIC_AUTH_TOKEN else None
-            repo_info = json.loads(self.do_get_request(api_url, auth=auth))
-            self.package.description = repo_info["description"]
-            self.package.stars = repo_info["stargazers_count"]
 
-            request_url = "{}/releases".format(api_url)
-            releases = json.loads(self.do_get_request(request_url, auth=auth))
-            release_found = False
+            repo_info = json.loads(self.do_post_request(api_url, json=query, auth=auth))
+            self.package.description = repo_info["data"]["repository"]["description"]
+            self.package.stars = repo_info["data"]["repository"]["stargazers"]["totalCount"]
+
+            releases = repo_info["data"]["repository"]["releases"]["nodes"]
             for release in releases:
-                release_date = dateutil.parser.parse(release["published_at"], ignoretz=True)
-                if release["prerelease"] or self.package.date is not None and self.package.date > release_date:
+                release_date = dateutil.parser.parse(release["publishedAt"], ignoretz=True)
+                if release["isDraft"] or release["isPrerelease"] or self.package.date is not None and self.package.date > release_date:
                     continue
-                self.package.date = release_date
-                self.package.version = release["tag_name"]
-                for asset in release["assets"]:
+                for asset in release["releaseAssets"]["nodes"]:
                     if asset["name"].endswith(".keypirinha-package"):
-                        self.package.download_url = asset["browser_download_url"]
+                        self.package.date = release_date
+                        self.package.version = release["tagName"]
+                        self.package.download_url = asset["downloadUrl"]
                         self.package.filename = asset["name"]
+                        release_found = True
                         break
-                release_found = True
 
             if not release_found:
                 LOGGER.error("No release found in repo: %s: %s", self.package.owner, self.package.repo)
