@@ -59,6 +59,7 @@ class Github(PackageSourceBase):
             self.package.description = repo_info["data"]["repository"]["description"]
             self.package.stars = repo_info["data"]["repository"]["stargazers"]["totalCount"]
 
+            release_found = False
             releases = repo_info["data"]["repository"]["releases"]["nodes"]
             for release in releases:
                 release_date = dateutil.parser.parse(release["publishedAt"], ignoretz=True)

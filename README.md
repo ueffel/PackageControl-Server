@@ -62,8 +62,10 @@ location @packagecontrol {
   authentication with username "admin" and password configurable with `ADMIN_PW` setting)
     * `/sync/` is the endpoint for mirrors to get the all packages (not secured)
     * `/sync/mirrors/` lists all configured mirrors in the format `key: url`
-    * `/sync/add_mirror/<url>` checks and adds `url` as a mirror (should be the `/sync/` endpoint of
+    * `/sync/add_mirror?url=<url>` checks and adds `url` as a mirror (should be the `/sync/` endpoint of
       another repository, e.g. https://ue.spdns.de/packagecontrol/sync/)
+
+      ```http://localhost:9001/packagecontrol/sync/add_mirror/?url=https://ue.spdns.de/packagecontrol/sync```
     * `/sync/start/` starts the synchronisation process
     * `/sync/delete_mirror/<key>` removes a mirror (`key` from `/sync/mirrors/` endpoint, e.g.
       MIRROR_0)
