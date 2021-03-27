@@ -71,7 +71,11 @@
                         <div class="action-bar">
                             <a class="action" href="{{ package.homepage }}">Visit homepage</a>
                             {% if package.last_updated and package.last_update_successful %}
-                            <a class="action" href="{{ package.download_url }}">Download package</a>
+                            <a class="action" href="{{ package.download_url }}">Download package
+                                {% if package.download_count %}
+                                 ({{ package.download_count }} downloads)
+                                {% endif %}
+                            </a>
                             {% endif %}
                         </div>
                     </div>
