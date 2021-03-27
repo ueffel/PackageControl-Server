@@ -20,13 +20,14 @@ class Package(Base):
     date = Column(DateTime, nullable=True)
     version = Column(String(50), nullable=True)
     download_url = Column(String(1000), nullable=True)
+    download_count = Column(Integer, nullable=True)
     homepage = Column(String(1000), nullable=True)
     stars = Column(Integer, nullable=True)
     __table_args__ = (UniqueConstraint("owner", "repo", "ptype", "path"),)
 
     def __init__(self, owner=None, repo=None, ptype=None, path=None, added=None, last_updated=None,
                  last_update_successful=None, name=None, description=None, filename=None, date=None, version=None,
-                 download_url=None, homepage=None):
+                 download_url=None, download_count=None, homepage=None):
         self.owner = owner
         self.repo = repo
         self.ptype = ptype
@@ -40,6 +41,7 @@ class Package(Base):
         self.date = date
         self.version = version
         self.download_url = download_url
+        self.download_count = download_count
         self.homepage = homepage
 
     @hybrid_property

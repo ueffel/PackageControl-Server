@@ -83,6 +83,10 @@ h1 {
     flex-flow: column;
 }
 
+.package--name {
+    height: 2.2rem;
+}
+
 .package--description {
     margin: 0.25rem 0 0.5rem;
 }
@@ -97,14 +101,20 @@ h1 {
     color: #111;
 }
 
-.stars {
+.package--additionals {
     position: absolute;
     top: 1rem;
     right: 1rem;
 }
 
-.stars svg {
-    height: 0.9rem;
+.package--additionals span {
+    float: right;
+    margin-left: .1rem;
+    line-height: 1;
+}
+
+.stars svg, .download svg {
+    height: 1rem;
     width: 1rem;
 }
 

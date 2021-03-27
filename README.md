@@ -4,11 +4,13 @@ This a [Flask](http://flask.pocoo.org/) application to host a package repository
 [Keypirinha-PackageControl](https://github.com/ueffel/Keypirinha-PackageControl).
 
 ## Requirements
+
 * Python >= 3.5
 * pip (to install the needed packages)
 * wsgi server to serve the app
 
 ## Installation
+
 * Download or clone the repository
 * Run `pip install -r requirements.txt`
 * Copy or rename `config.py.template` to `config.py`
@@ -16,12 +18,12 @@ This a [Flask](http://flask.pocoo.org/) application to host a package repository
   github basic auth to get around API limits)
 * Configure the wsgi server of your choice to serve `app` from the `packagecontrol.py` file or
   install [cheroot](https://pypi.org/project/Cheroot/) and just run `packagecontrol.py` (deployment
-  at http://localhost:9001/packagecontrol/)
-
+  at <http://localhost:9001/packagecontrol/>)
 
 Example configuration for [uwsgi](http://projects.unbit.it/uwsgi) with [nginx](https://nginx.org/):
 
 packagecontrol.ini
+
 ```ini
 [uwsgi]
 plugin = http,python3
@@ -33,6 +35,7 @@ manage-script-name = true
 ```
 
 nginx conf snippet:
+
 ```nginx
 location /packagecontrol {
     try_files does_not_exist @packagecontrol;
@@ -52,30 +55,33 @@ location @packagecontrol {
 ```
 
 ## Using the repository
+
 * Open browser and add packages
 * Change your Keypirinha-PackageControl configuration to your repository's packages.json location
   (if everything works its in the text field at the bottom of the index page)
 
 ## Advanced usage
+
 * Use the `/sync/`, `/sync/start/`, `/sync/mirrors/`, `/sync/add_mirror/<url>` and
   `/sync/delete_mirror/<key>` end points to synchronize with another repository (Secured with basic
   authentication with username "admin" and password configurable with `ADMIN_PW` setting)
-    * `/sync/` is the endpoint for mirrors to get the all packages (not secured)
-    * `/sync/mirrors/` lists all configured mirrors in the format `key: url`
-    * `/sync/add_mirror?url=<url>` checks and adds `url` as a mirror (should be the `/sync/` endpoint of
-      another repository, e.g. https://ue.spdns.de/packagecontrol/sync/)
+  * `/sync/` is the endpoint for mirrors to get the all packages (not secured)
+  * `/sync/mirrors/` lists all configured mirrors in the format `key: url`
+  * `/sync/add_mirror?url=<url>` checks and adds `url` as a mirror (should be the `/sync/` endpoint of
+    another repository, e.g. <https://ue.spdns.de/packagecontrol/sync/>)
 
-      ```http://localhost:9001/packagecontrol/sync/add_mirror/?url=https://ue.spdns.de/packagecontrol/sync```
-    * `/sync/start/` starts the synchronisation process
-    * `/sync/delete_mirror/<key>` removes a mirror (`key` from `/sync/mirrors/` endpoint, e.g.
-      MIRROR_0)
+    ```http://localhost:9001/packagecontrol/sync/add_mirror/?url=https://ue.spdns.de/packagecontrol/sync```
+
+  * `/sync/start/` starts the synchronisation process
+  * `/sync/delete_mirror/<key>` removes a mirror (`key` from `/sync/mirrors/` endpoint, e.g.
+    MIRROR_0)
 * Write a new packages source class to support your own way of providing packages
 * Inherit from PackageSourceBase and implement `update` and `is_available`
 * Look at the other sources for some implementation pointers
 * Put it into model\PackageSource\
 
-
 Example: WebFile.py
+
 ```python
 import requests
 import os.path

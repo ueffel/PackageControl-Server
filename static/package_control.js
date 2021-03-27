@@ -54,6 +54,12 @@ function sortPackages(button)
                 left_value = new Date(left.getElementsByClassName("package--added")[0].getAttribute("datetime"));
                 right_value = new Date(right.getElementsByClassName("package--added")[0].getAttribute("datetime"));
                 break;
+            case "downloads":
+                left_downloads = left.getElementsByClassName("package--downloads");
+                right_downloads = right.getElementsByClassName("package--downloads");
+                left_value = left_downloads.length > 0 ? parseInt(left_downloads[0].innerHTML) : 0;
+                right_value = right_downloads.length > 0 ? parseInt(right_downloads[0].innerHTML) : 0;
+                break;
             default:
                 break;
         }
