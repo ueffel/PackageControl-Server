@@ -32,6 +32,7 @@ class Github(PackageSourceBase):
           nodes {
             name
             downloadUrl
+            downloadCount
           }
         }
         tagName
@@ -70,6 +71,7 @@ class Github(PackageSourceBase):
                         self.package.date = release_date
                         self.package.version = release["tagName"]
                         self.package.download_url = asset["downloadUrl"]
+                        self.package.download_count = asset["downloadCount"]
                         self.package.filename = asset["name"]
                         release_found = True
                         break
