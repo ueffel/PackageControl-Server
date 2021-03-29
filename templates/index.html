@@ -78,10 +78,17 @@
                             {% endif %}
                         </div>
                     </div>
+<<<<<<< HEAD
                     {% if package.stars or package.download_count %}
                     <div class="stars" title="Github stars and downloads">
                         {% if package.download_count and package.download_count > 0 %}
                             <svg aria-label="downloads" role="img"><use xlink:href="#svg_downloads" /></svg><span class="package--stars">{{ package.download_count }}</span>
+=======
+                    {% if package.stars and package.stars > 0 %}
+                    <div class="stars" title="Github stars and downloads">
+                        {% if package.download_count and package.download_count > 0 %}
+                            ({{ package.download_count }} downloads)
+>>>>>>> 5892f17713331b93ddcfa8ad99fd875062aeb21c
                         {% endif %}
                         {% if package.stars and package.stars > 0 %}
                             <svg aria-label="star" role="img"><use xlink:href="#svg_star" /></svg><span class="package--stars">{{ package.stars }}</span>
