@@ -35,6 +35,9 @@
             <svg aria-label="star" height="16" width="14" role="img" style="display: none;">
                 <path id="svg_star" fill-rule="evenodd" d="M14 6l-4.9-.64L7 1 4.9 5.36 0 6l3.6 3.26L2.67 14 7 11.67 11.33 14l-.93-4.74L14 6z" />
             </svg>
+            <svg aria-label="downloads" height="16" width="14" viewBox="0 0 21 21" role="img" style="display: none;">
+                <polyline id="svg_downloads" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="19 12 12 19 12 5 12 19 5 12 12 19 12 21 5 21 19 21"></polyline>
+            </svg>
             <ul id="package-list">
             {% for package in packages %}
                 <li class="package">
@@ -71,17 +74,18 @@
                         <div class="action-bar">
                             <a class="action" href="{{ package.homepage }}">Visit homepage</a>
                             {% if package.last_updated and package.last_update_successful %}
-                            <a class="action" href="{{ package.download_url }}">Download package
-                                {% if package.download_count %}
-                                 ({{ package.download_count }} downloads)
-                                {% endif %}
-                            </a>
+                            <a class="action" href="{{ package.download_url }}">Download package</a>
                             {% endif %}
                         </div>
                     </div>
-                    {% if package.stars and package.stars > 0 %}
-                    <div class="stars" title="Github stars">
-                        <svg aria-label="star" role="img"><use xlink:href="#svg_star" /></svg><span class="package--stars">{{ package.stars }}</span>
+                    {% if package.stars or package.download_count %}
+                    <div class="stars" title="Github stars and downloads">
+                        {% if package.download_count and package.download_count > 0 %}
+                            <svg aria-label="downloads" role="img"><use xlink:href="#svg_downloads" /></svg><span class="package--stars">{{ package.download_count }}</span>
+                        {% endif %}
+                        {% if package.stars and package.stars > 0 %}
+                            <svg aria-label="star" role="img"><use xlink:href="#svg_star" /></svg><span class="package--stars">{{ package.stars }}</span>
+                        {% endif %}
                     </div>
                     {% endif %}
                 </li>
