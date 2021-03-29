@@ -86,8 +86,8 @@
                             <svg aria-label="star" height="16" width="14" role="img"><use xlink:href="#svg_star" /></svg><span class="package--stars">{{ package.stars }}</span>
                         </div>
                         {% endif %}
-                        <div class="download" title="Github downloads">
                         {% if package.download_count and package.download_count > 0 %}
+                        <div class="download" title="Github downloads">
                             <svg aria-label="downloads" height="16" width="14" viewBox="2 4 20 18" role="img"><use xlink:href="#svg_downloads" /></svg><span class="package--downloads">{{ package.download_count }}</span>
                         </div>
                         {% endif %}
