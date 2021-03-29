@@ -98,7 +98,6 @@ def packages_json_generate():
                            Package.date,
                            Package.version,
                            Package.download_url,
-                           Package.download_count,
                            Package.homepage))
     iter_cached_packages = iter(cached_packages)
     package = next(iter_cached_packages, None)
@@ -160,7 +159,6 @@ def json_dump_package(package):
         "date": package.date.isoformat(),
         "description": package.description,
         "download_url": package.download_url,
-        "download_count": package.download_count,
         "filename": package.filename,
         "homepage": package.homepage,
         "name": package.name,
