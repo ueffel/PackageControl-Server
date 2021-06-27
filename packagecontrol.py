@@ -1,14 +1,18 @@
 import inspect
 import asyncio
 import dateutil.parser
+import feedgenerator
 import json
 import requests
+import pytz
 import traceback
 import model.PackageSource
 from flask import Flask, redirect, jsonify, render_template, url_for, request, Response, stream_with_context
-from sqlalchemy import or_, and_, not_, func
+from sqlalchemy import or_, and_, not_, func, desc, asc
 from sqlalchemy.orm import defer, load_only
 from datetime import datetime, timedelta
+from email.utils import parsedate_to_datetime
+from wsgiref.handlers import format_date_time
 from model.DB import db_session, init_db
 from model.Package import Package
 from model.Property import Property
@@ -431,6 +435,95 @@ def delete_mirror(identifier):
     else:
         return Response("Mirror '{}' not found.\n".format(identifier), 404, mimetype="text/plain")
 
+
+def get_feed_packages():
+    return (
+        db_session.query(Package)
+        .order_by(desc(Package.added), asc(Package.name), asc(Package.owner))
+        .options(
+            load_only(
+                Package.owner,
+                Package.name,
+                Package.homepage,
+                Package.description,
+                Package.added,
+            )
+        )
+        .all()
+    )
+
+def add_feed_items(feed, packages):
+    for package in packages:
+        if package.name.startswith("Keypirinha-"):
+            package.name = package.name[len("Keypirinha-"):]
+        if package.name.startswith("keypirinha-"):
+            package.name = package.name[len("keypirinha-"):]
+        if package.name.startswith("Plugin-"):
+            package.name = package.name[len("Plugin-"):]
+        feed.add_item(
+            title=package.name,
+            author_name=package.owner,
+            description=package.description,
+            link=package.homepage,
+            unique_id=package.homepage,
+            pubdate=package.added
+        )
+
+def check_if_modified_since():
+    if "If-Modified-Since" not in request.headers:
+        return False
+    ims = request.headers["If-Modified-Since"]
+    t = parsedate_to_datetime(ims)
+    if not t:
+        return False
+
+    max = db_session.query(Package).order_by(desc(Package.added)).limit(1).first()
+    if not max:
+        return False
+
+    return t >= max.added.replace(tzinfo=pytz.utc)
+
+
+@app.route("/rss")
+def rss_feed():
+    if check_if_modified_since():
+        return Response(status=304)
+
+    packages = get_feed_packages()
+    created = packages[0].added if packages else datetime.utcnow()
+    url = url_for("rss_feed", _external=True)
+    feed = feedgenerator.Rss201rev2Feed(
+        title="Keypirinha-Packagecontrol: New packages",
+        link=url,
+        description="New packages added to keypirinha packagecontrol",
+        pubdate=created,
+    )
+    add_feed_items(feed, packages)
+
+    return Response(feed.writeString("utf-8"),
+                    mimetype=feed.mime_type,
+                    headers={"Last-Modified": format_date_time(created.replace(tzinfo=pytz.utc).timestamp())})
+
+@app.route("/atom")
+def atom_feed():
+    if check_if_modified_since():
+        return Response(status=304)
+
+    packages = get_feed_packages()
+    created = packages[0].added if packages else datetime.utcnow()
+    feed = feedgenerator.Atom1Feed(
+        title="Keypirinha-Packagecontrol: New packages",
+        link=url_for("index", _external=True),
+        feed_url=url_for("atom_feed", _external=True),
+        description="New packages added to keypirinha packagecontrol",
+        subtitle="New packages added to keypirinha packagecontrol",
+        pubdate=created,
+    )
+    add_feed_items(feed, packages)
+
+    return Response(feed.writeString("utf-8"),
+                    mimetype=feed.mime_type,
+                    headers={"Last-Modified": format_date_time(created.replace(tzinfo=pytz.utc).timestamp())})
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):

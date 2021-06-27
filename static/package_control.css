@@ -220,3 +220,7 @@ span.question_mark:hover~.tooltip {
 span.question_mark:hover~.tooltip p {
     text-align: left;
 }
+
+.feeds>svg {
+    height: 1rem;
+}

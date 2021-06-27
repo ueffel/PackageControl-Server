@@ -57,7 +57,7 @@ class Github(PackageSourceBase):
                 if GITHUB_BASIC_AUTH_USER and GITHUB_BASIC_AUTH_TOKEN else None
 
             repo_info = json.loads(self.do_post_request(api_url, json=query, auth=auth))
-            self.package.description = repo_info["data"]["repository"]["description"]
+            self.package.description = repo_info["data"]["repository"]["description"] if repo_info["data"]["repository"]["description"] else "no description"
             self.package.stars = repo_info["data"]["repository"]["stargazers"]["totalCount"]
 
             release_found = False
