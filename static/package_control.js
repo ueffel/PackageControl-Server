@@ -14,6 +14,32 @@ function sortPackages(button)
     }
     sortBy = button.getAttribute("data-sort-field");
 
+    // reset other buttons
+    sortButtons = document.getElementsByClassName("sort-controls")[0].getElementsByTagName("button");
+    for (let i = 0; i < sortButtons.length; i++)
+    {
+        if (button !== sortButtons[i])
+        {
+            let resetDirection;
+            switch (sortButtons[i].getAttribute("data-sort-field"))
+            {
+                case "name":
+                case "author":
+                    resetDirection = "asc"
+                    break;
+                case "updated":
+                case "added":
+                case "stars":
+                case "downloads":
+                    resetDirection = "desc"
+                    break;
+                default:
+                    break;
+            }
+            sortButtons[i].setAttribute("data-sort-dir", resetDirection === undefined ? "asc" : resetDirection);
+        }
+    }
+
     let packages = [].slice.call(document.getElementsByClassName("package"));
     if (!button.hasAttribute("data-sort-dir") || button.getAttribute("data-sort-dir") == "asc")
     {
