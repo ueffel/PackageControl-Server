@@ -136,10 +136,10 @@ function makeRelativeTime(date)
     }
     else
     {
-        let days = Math.floor(diff / (24 * 60 * 60 * 1000));
-        let hours = Math.floor(diff / (60 * 60 * 1000));
-        let minutes = Math.floor(diff / (60 * 1000));
-        let seconds = Math.floor(diff / 1000);
+        let days = Math.round(diff / (24 * 60 * 60 * 1000));
+        let hours = Math.round(diff / (60 * 60 * 1000));
+        let minutes = Math.round(diff / (60 * 1000));
+        let seconds = Math.round(diff / 1000);
         let date_str;
 
         if (days > 0)
