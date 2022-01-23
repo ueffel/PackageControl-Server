@@ -136,27 +136,27 @@ function makeRelativeTime(date)
     }
     else
     {
-        let days = Math.round(diff / (24 * 60 * 60 * 1000));
-        let hours = Math.round(diff / (60 * 60 * 1000));
-        let minutes = Math.round(diff / (60 * 1000));
-        let seconds = Math.round(diff / 1000);
+        let days = diff / (24 * 60 * 60 * 1000);
+        let hours = diff / (60 * 60 * 1000);
+        let minutes = diff / (60 * 1000);
+        let seconds = diff / 1000;
         let date_str;
 
-        if (days > 0)
+        if (Math.floor(days) > 0)
         {
-            date_str = days + " days";
+            date_str = Math.round(days) + " days";
         }
-        else if (hours > 0)
+        else if (Math.floor(hours) > 0)
         {
-            date_str = hours + " hours";
+            date_str = Math.round(hours) + " hours";
         }
-        else if (minutes > 0)
+        else if (Math.floor(minutes) > 0)
         {
-            date_str = minutes + " minutes"
+            date_str = Math.round(minutes) + " minutes"
         }
         else
         {
-            date_str = seconds + " seconds";
+            date_str = Math.round(seconds) + " seconds";
         }
         date_str += " ago";
         return date_str;
