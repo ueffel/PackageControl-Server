@@ -1,10 +1,9 @@
-import logging
-from config import LOGGER, DATABASE_URI
+from config import DATABASE_URI
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-engine = create_engine(DATABASE_URI, convert_unicode=True, pool_pre_ping=True)
+engine = create_engine(DATABASE_URI, connect_args={"charset": "utf8"}, pool_pre_ping=True, pool_size=2, max_overflow=3)
 db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 Base = declarative_base()
 
