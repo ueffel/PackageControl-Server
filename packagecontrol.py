@@ -10,7 +10,7 @@ import model.PackageSource
 from flask import Flask, redirect, jsonify, render_template, url_for, request, Response, stream_with_context
 from sqlalchemy import or_, and_, not_, func, desc, asc
 from sqlalchemy.orm import defer, load_only
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from wsgiref.handlers import format_date_time
 from model.DB import db_session, init_db
@@ -79,9 +79,9 @@ def packages_json():
     update_needed = db_session.query(func.count(Package.pid)) \
         .filter(or_(Package.last_updated.is_(None),
                     and_(Package.last_update_successful,
-                         Package.last_updated < datetime.utcnow() - timedelta(hours=24)),
+                         Package.last_updated < datetime.now(timezone.utc) - timedelta(hours=24)),
                     and_(not_(Package.last_update_successful),
-                         Package.last_updated < datetime.utcnow() - timedelta(hours=4)))).scalar() > 0
+                         Package.last_updated < datetime.now(timezone.utc) - timedelta(hours=4)))).scalar() > 0
 
     return Response(stream_with_context(packages_json_generate()),
                     mimetype="application/json",
@@ -94,7 +94,7 @@ def packages_json_generate():
     cached_packages = db_session.query(Package) \
         .filter(Package.last_updated.isnot(None),
                 Package.last_update_successful,
-                Package.last_updated >= datetime.utcnow() - timedelta(hours=24)) \
+                Package.last_updated >= datetime.now(timezone.utc) - timedelta(hours=24)) \
         .options(load_only(Package.owner,
                            Package.name,
                            Package.description,
@@ -113,9 +113,9 @@ def packages_json_generate():
     update_packages = db_session.query(Package) \
         .filter(or_(Package.last_updated.is_(None),
                     and_(Package.last_update_successful,
-                         Package.last_updated < datetime.utcnow() - timedelta(hours=24)),
+                         Package.last_updated < datetime.now(timezone.utc) - timedelta(hours=24)),
                     and_(not_(Package.last_update_successful),
-                         Package.last_updated < datetime.utcnow() - timedelta(hours=4)))) \
+                         Package.last_updated < datetime.now(timezone.utc) - timedelta(hours=4)))) \
         .options(load_only(Package.owner,
                            Package.repo,
                            Package.path,
@@ -148,7 +148,7 @@ def packages_json_generate():
     loop.close()
 
     if update_tasks:
-        last_updated_prop = Property("last_updated", date_val=datetime.utcnow())
+        last_updated_prop = Property("last_updated", date_val=datetime.now(timezone.utc))
         last_updated_prop = db_session.merge(last_updated_prop)
         db_session.commit()
         last_updated = last_updated_prop.date_val
@@ -171,21 +171,21 @@ def json_dump_package(package):
     }, separators=(',', ':'))
 
 
-@app.route("/new_package", methods=["GET", "POST"])
-def new_package():
-    from form.SubmitPackageForm import SubmitPackageForm
-    form = SubmitPackageForm()
-
-    required_if_fields = form.required_if_fields()
-
-    if request.method == "POST" and form.validate():
-        insert_package(form.owner.data, form.repo.data, form.type.data, form.path.data if form.path.data else None)
-        return redirect(url_for("index"))
-
-    return render_template("new_package.html",
-                           title=REPO_NAME,
-                           form=form,
-                           required_if_fields=required_if_fields)
+# @app.route("/new_package", methods=["GET", "POST"])
+# def new_package():
+#     from form.SubmitPackageForm import SubmitPackageForm
+#     form = SubmitPackageForm()
+#
+#     required_if_fields = form.required_if_fields()
+#
+#     if request.method == "POST" and form.validate():
+#         insert_package(form.owner.data, form.repo.data, form.type.data, form.path.data if form.path.data else None)
+#         return redirect(url_for("index"))
+#
+#     return render_template("new_package.html",
+#                            title=REPO_NAME,
+#                            form=form,
+#                            required_if_fields=required_if_fields)
 
 
 @app.route("/update_package/<int:package_id>")
@@ -193,7 +193,7 @@ def update_package_by_id(package_id):
     package = db_session.query(Package) \
         .filter(Package.pid == package_id,
                 or_(Package.last_updated.is_(None),
-                    Package.last_updated <= datetime.utcnow() - timedelta(hours=2))) \
+                    Package.last_updated <= datetime.now(timezone.utc) - timedelta(hours=2))) \
         .options(load_only(Package.owner,
                            Package.repo,
                            Package.path,
@@ -205,7 +205,7 @@ def update_package_by_id(package_id):
         asyncio.set_event_loop(loop)
         try:
             loop.run_until_complete(asyncio.ensure_future(update_package(package)))
-            last_updated_prop = Property("last_updated", date_val=datetime.utcnow())
+            last_updated_prop = Property("last_updated", date_val=datetime.now(datetime.UTC))
             db_session.merge(last_updated_prop)
             db_session.commit()
         except Exception as ex:
@@ -236,7 +236,7 @@ async def update_package(package):
 
     source = source_type(package)
     package.last_update_successful = await asyncio.get_event_loop().run_in_executor(None, source.update)
-    package.last_updated = datetime.utcnow()
+    package.last_updated = datetime.now(timezone.utc)
     return package if package.last_update_successful else None
 
 
@@ -490,7 +490,7 @@ def rss_feed():
         return Response(status=304)
 
     packages = get_feed_packages()
-    created = packages[0].added if packages else datetime.utcnow()
+    created = packages[0].added if packages else datetime.now(timezone.utc)
     url = url_for("rss_feed", _external=True)
     feed = feedgenerator.Rss201rev2Feed(
         title="Keypirinha-Packagecontrol: New packages",
@@ -510,7 +510,7 @@ def atom_feed():
         return Response(status=304)
 
     packages = get_feed_packages()
-    created = packages[0].added if packages else datetime.utcnow()
+    created = packages[0].added if packages else datetime.now(timezone.utc)
     feed = feedgenerator.Atom1Feed(
         title="Keypirinha-Packagecontrol: New packages",
         link=url_for("index", _external=True),
@@ -543,3 +543,5 @@ if __name__ == "__main__":
     d = wsgi.PathInfoDispatcher({"/": redirect_app, "/packagecontrol": app})
     server = wsgi.Server(("::", 9001), d)
     server.start()
+    # import fastwsgi
+    # fastwsgi.run(wsgi_app=app, host="[::]", port=9001)

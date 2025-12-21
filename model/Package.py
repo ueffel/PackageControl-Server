@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, UniqueConstraint
 from sqlalchemy.ext.hybrid import hybrid_property
 from model.DB import Base
@@ -11,13 +11,13 @@ class Package(Base):
     repo = Column(String(100), nullable=False)
     ptype = Column(String(100), nullable=False)
     path = Column(String(100), nullable=True)
-    added = Column(DateTime, nullable=False, default=datetime.utcnow)
-    last_updated = Column(DateTime, nullable=True)
+    added = Column(DateTime(timezone=True), nullable=False, default=datetime.now(timezone.utc))
+    last_updated = Column(DateTime(timezone=True), nullable=True)
     last_update_successful = Column(Boolean, nullable=False, default=False)
     name = Column(String(100), nullable=True)
     description = Column(String(255), nullable=True)
     filename = Column(String(255), nullable=True)
-    date = Column(DateTime, nullable=True)
+    date = Column(DateTime(timezone=True), nullable=True)
     version = Column(String(50), nullable=True)
     download_url = Column(String(1000), nullable=True)
     download_count = Column(Integer, nullable=True)
@@ -46,4 +46,4 @@ class Package(Base):
 
     @hybrid_property
     def updatable(self):
-        return self.last_updated is None or self.last_updated <= datetime.utcnow() - timedelta(hours=4)
+        return self.last_updated is None or self.last_updated.replace(tzinfo=timezone.utc) <= datetime.now(timezone.utc) - timedelta(hours=4)

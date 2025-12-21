@@ -7,7 +7,7 @@ class Property(Base):
     identifier = Column(String(50), primary_key=True)
     int_val = Column(Integer, nullable=True)
     text_val = Column(String(500), nullable=True)
-    date_val = Column(DateTime, nullable=True)
+    date_val = Column(DateTime(timezone=True), nullable=True)
 
     def __init__(self, identifier, int_val=None, text_val=None, date_val=None):
         self.identifier = identifier
