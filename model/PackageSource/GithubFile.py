@@ -9,6 +9,7 @@ import os.path
 
 
 class GithubFile(PackageSourceBase):
+    name = "GithubFile"
     description = "Not a dedicated repository for the package, just a file within collective repository"
     long_description = "A github repository where the *.keypirinha-package file is committed directly into it." \
                        " The download URL will point to the most recent commit of this file. The github user, the" \

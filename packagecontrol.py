@@ -33,9 +33,9 @@ def get_package_sources():
                 and source != PackageSourceBase.PackageSourceBase:
             package_sources.append(source)
     package_sources_descriptions.update(
-        {package_type.__name__: package_type.description for package_type in package_sources})
+        {package_type.name: package_type.description for package_type in package_sources})
     package_sources_long_descriptions.update(
-        {package_type.__name__: package_type.long_description for package_type in package_sources})
+        {package_type.name: package_type.long_description for package_type in package_sources})
 
 
 LOGGER.debug("collecting packages sources")
@@ -205,7 +205,7 @@ def update_package_by_id(package_id):
         asyncio.set_event_loop(loop)
         try:
             loop.run_until_complete(asyncio.ensure_future(update_package(package)))
-            last_updated_prop = Property("last_updated", date_val=datetime.now(datetime.UTC))
+            last_updated_prop = Property("last_updated", date_val=datetime.now(timezone.utc))
             db_session.merge(last_updated_prop)
             db_session.commit()
         except Exception as ex:
@@ -220,7 +220,7 @@ def update_package_by_id(package_id):
 def insert_package(owner, repo, ptype, path=None, added=None, commit=True):
     package = Package(owner, repo, ptype, path, added)
     source_type = next((package_source for package_source in package_sources
-                        if package_source.__name__ == package.ptype), None)
+                        if package_source.name == package.ptype), None)
     if source_type:
         source_type(package)
         db_session.add(package)
@@ -230,7 +230,7 @@ def insert_package(owner, repo, ptype, path=None, added=None, commit=True):
 
 async def update_package(package):
     source_type = next((package_source for package_source in package_sources
-                        if package_source.__name__ == package.ptype), None)
+                        if package_source.name == package.ptype), None)
     if not source_type:
         return None
 

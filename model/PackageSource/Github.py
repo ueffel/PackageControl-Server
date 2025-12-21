@@ -9,6 +9,7 @@ import urllib
 
 
 class Github(PackageSourceBase):
+    name = "Github"
     description = "An entire repository on github.com dedicated to the package"
     long_description = "(recommended) A entire github repository to the package. It should have a release" \
                        " (not pre-release) in its releases section which has a ready-to-use *.keypirinha-package file" \
